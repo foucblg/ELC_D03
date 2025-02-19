@@ -1,3 +1,11 @@
-#canvas{
-    border: 1px solid black;
+.grid {
+    display: grid;
+    grid-template-columns: repeat(5, 24px);
+    border: 2px solid black;
+    width: fit-content;
+}
+
+canvas {
+    box-sizing: border-box;
+    border: 2px solid transparent;
 }

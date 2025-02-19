@@ -1,27 +1,34 @@
-var canvas = document.querySelector("canvas");
-var ctx = canvas.getContext("2d");
-var size = 20;
-var width = canvas.width/size;
-var height = canvas.height/size;
-var tab = Array.from({ length: height }, () => Array(width).fill(0));
+var size_px = 20;
+var dim = 5;
+var id_clicked = 0
+var container = document.getElementById("gridContainer");
 
-paint(tab);
-canvas.addEventListener("click", function(event) {
-    var rect = canvas.getBoundingClientRect();
-    var x = event.clientX - rect.left;
-    var y = event.clientY - rect.top;
+for (var i = 0; i < dim; i++) {
+    for (var j = 0; j < dim; j++) {
+        let canvas = document.createElement("canvas");
+        canvas.width = size_px;
+        canvas.height = size_px;
+        container.appendChild(canvas);
 
-    tab[Math.floor(y / 20)][Math.floor(x / 20)] = 1;
-    paint(tab);
-});
-
-function paint(tab){
-    for (var i = 0; i < width; i++) {
-        for (var j = 0; j < height; j++) {
-            if (tab[i][j] == 1) {
-                ctx.fillStyle = "green";
-                ctx.fillRect(j * size,i * size, size,size);
-            }
-        }
+        
+        canvas.addEventListener("click", (function(i, j) {
+            return function() {
+                selectCanvas(i, j);
+            };
+        })(i, j));
     }
+}
+
+function selectCanvas(i, j) {
+    container.children[id_clicked].style.border = "none";
+    id_clicked = i*dim + j;
+    container.children[id_clicked].style.border = "2px solid red";
+}
+function drawInCanvas(i, j) {
+    console.log(i, j);
+    let canvas = container.children[i * dim + j];
+    let ctx = canvas.getContext("2d");
+
+    ctx.fillStyle = "green";
+    ctx.fillRect(0, 0, size_px, size_px);
 }
