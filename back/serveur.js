@@ -12,10 +12,15 @@ function handler(request, response) {
     if (path2 == "/") {
         path2 = "/index.html"
     };
-    path2 = 'front' + path2;
-    fichier = fs.readFileSync(path2, "utf-8");
-    response.write(fichier);
-    response.end();
+    if (false && path2 == "/favicon.ico") {
+        response.setHeader('Content-Type', 'image/x-icon');
+        fs.createReadStream('front' + path2).pipe(response);
+    } else { // Le navigateur fait ça tout seul
+        path2 = 'front' + path2;
+        fichier = fs.readFileSync(path2, "utf-8");
+        response.write(fichier);
+        response.end();
+    }
 }
 
 const serveur = http.createServer(handler);
