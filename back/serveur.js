@@ -1,18 +1,23 @@
 const http = require('http');
 const url = require('url');
+const fs = require('fs')
+const path = require('path');
 
-function handler(req, res) {
-    const parsedUrl =url.parse(req.url, true);
-    if(parsedUrl.pathname === '/'){
-        res.writeHead(200, {'Content-type':'text/plain'});
-        res.write('Yo !');
-        res.end();
-    }else {
-        res.writeHead(404, {'Content-type':'text/plain'});
-        res.end();
+const host = process.env.HOST || 'localhost';
+const port = process.env.PORT || 3000;
+
+function handler(request, response) {
+    var path2 = request.url;
+    console.log('Requête : ', path2);
+    if (path2 == "/") {
+        path2 = "/index.html"
     };
+    path2 = 'front' + path2;
+    fichier = fs.readFileSync(path2, "utf-8");
+    response.write(fichier);
+    response.end();
 }
 
-const server = http.createServer(handler);
+const serveur = http.createServer(handler);
 
-server.listen(3000);
+serveur.listen(3000);
