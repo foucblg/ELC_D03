@@ -6,6 +6,8 @@ container.style.gridTemplateColumns = `repeat(${dim}, ${size_px+4}px)`;
 var color_picked = "green";
 var drawed = false;
 var previous_id_clicked = -1;
+var x;
+var y;
 
 for (var i = 0; i < dim; i++) {
     for (var j = 0; j < dim; j++) {
@@ -27,6 +29,8 @@ function selectCanvas(i, j) {
     if (!drawed && previous_id_clicked != -1) {
         container.children[previous_id_clicked].style.border = "None";
     }
+    x = i;
+    y = j;
     id_clicked = i*dim + j;
     container.children[id_clicked].style.border = "2px solid red";
     previous_id_clicked = id_clicked;
@@ -51,5 +55,38 @@ colorBoxes.forEach(function(box) {
         if (id_clicked == -1) return;
         color_picked = box.getAttribute("data-color");
         drawInCanvas(id_clicked);
+        sendPixel(new Pixel(x, y, color_picked));
     });
 });
+
+function sendPixel(pixel) {
+    const data =  pixel.toJson() ;
+    console.log(data);
+
+    fetch('http://localhost:3000/pixel', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: data
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log('Réponse du serveur:', data);
+        alert(data.message);
+    })
+    .catch(error => {
+        console.error('Erreur:', error);
+    });
+}
+
+function getPixel() {
+    fetch('http://localhost:3000/pixel')
+        .then(response => response.json())
+        .then(data => {
+            console.log(Pixel.fromJson(data));
+        })
+        .catch(error => {
+            console.error('Erreur:', error);
+        });
+}
