@@ -21,7 +21,6 @@ for (var i = 0; i < dim; i++) {
 }
 
 function selectCanvas(i, j) {
-    container.children[id_clicked].style.border = "none";
     id_clicked = i*dim + j;
     container.children[id_clicked].style.border = "2px solid red";
 }
@@ -32,7 +31,9 @@ function drawInCanvas(id) {
     let ctx = canvas.getContext("2d");
 
     ctx.fillStyle = color_picked;
-    ctx.fillRect(0, 0, size_px, size_px);
+    ctx.fillRect(0, 0, size_px+5, size_px+5);
+    canvas.style.border = "2px solid " +color_picked;
+    console.log("2px solid " +color_picked)
 }
 
 var colorBoxes = document.querySelectorAll(".color-box");
@@ -40,6 +41,5 @@ colorBoxes.forEach(function(box) {
     box.addEventListener("click", function() {
         color_picked = box.getAttribute("data-color");
         drawInCanvas(id_clicked);
-        container.children[id_clicked].style.border = "none";
     });
 });

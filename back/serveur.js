@@ -26,3 +26,33 @@ function handler(request, response) {
 const serveur = http.createServer(handler);
 
 serveur.listen(3000);
+
+// const WebSocket = require('ws');
+// const http = require('http');
+
+// const server = http.createServer((req, res) => {
+//   res.writeHead(200, { 'Content-Type': 'text/plain' });
+//   res.end('WebSocket server is running.');
+// });
+
+// const wss = new WebSocket.Server({ server });
+
+// wss.on('connection', (ws) => {
+//   console.log('Client connecté');
+
+//   ws.on('message', (message) => {
+//     console.log(`Message reçu : ${message}`);
+
+//     wss.clients.forEach((client) => {
+//       if (client.readyState === WebSocket.OPEN) {
+//         client.send(`Message reçu : ${message}`);
+//       }
+//     });
+//   });
+
+//   ws.send('Bienvenue sur le WebSocket Server !');
+// });
+
+// server.listen(8080, () => {
+//   console.log('Serveur WebSocket démarré sur ws://localhost:8080');
+// });
