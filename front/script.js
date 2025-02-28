@@ -79,5 +79,6 @@ socket.on("loadPixels", (pixels) => {
 });
 
 socket.on("placePixel", ({ x, y, color }) => {
-    drawInCanvas(x, y, color);
+    color_picked = color;
+    drawInCanvas(x * dim + y);
 });
