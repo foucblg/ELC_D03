@@ -7,9 +7,9 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 
-app.use(express.static('public'));
+app.use(express.static('front/'));
 
-const db = new Database('pixels.db');
+const db = new Database('back/pixels.db');
 
 db.exec(`
     CREATE TABLE IF NOT EXISTS pixels (
