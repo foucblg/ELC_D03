@@ -1,8 +1,4 @@
-#Mac
 **/*.DS_Store
-
-# .env
 **/*.env
-
-#db 
-back/pixels.db
+**/*.db
+node_modules

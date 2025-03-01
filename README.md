@@ -8,6 +8,14 @@ Dans `backend`, dupliquer `.env.template` en `.env`, et mettre les bonnes valeur
 
 ## Lancer le projet
 
+### Windows
+
 ```sh
-node .\back\serveur.js
+node .\back\server.js
+```
+
+### Autre (Unix-based)
+
+```sh
+node back/server.js
 ```
