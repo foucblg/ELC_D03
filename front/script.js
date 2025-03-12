@@ -75,12 +75,13 @@ function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms))
 }
 
-socket.on("loadPixels", (pixels) => {
-    pixels.forEach(async ({ x, y, color }) => {
+socket.on("loadPixels", async (pixels) => {
+    for (let i = 0; i < pixels.length; i++) {
+        let {x, y, color} = pixels[i];
         color_picked = color;
         drawInCanvas(x * dim + y);
-        await sleep(1000);
-    });
+        await sleep(100);
+    }
 });
 
 socket.on("placePixel", ({ x, y, color }) => {
