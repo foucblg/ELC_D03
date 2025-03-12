@@ -71,10 +71,15 @@ function drawInCanvas(id) {
     drawed = true;
 }
 
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms))
+}
+
 socket.on("loadPixels", (pixels) => {
-    pixels.forEach(({ x, y, color }) => {
+    pixels.forEach(async ({ x, y, color }) => {
         color_picked = color;
         drawInCanvas(x * dim + y);
+        await sleep(1000);
     });
 });
 
