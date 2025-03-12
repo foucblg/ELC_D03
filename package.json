@@ -2,7 +2,10 @@
   "dependencies": {
     "basic-auth": "^2.0.1",
     "better-sqlite3": "^11.8.1",
+    "cookie-parser": "^1.4.7",
     "express": "^4.21.2",
-    "socket.io": "^4.8.1"
+    "express-basic-auth": "^1.2.1",
+    "socket.io": "^4.8.1",
+    "uuid": "^11.1.0"
   }
 }
