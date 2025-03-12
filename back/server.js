@@ -24,7 +24,7 @@ db.exec(`
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         x INTEGER NOT NULL,
         y INTEGER NOT NULL,
-        color TEXT NOT NULL
+        color STRING NOT NULL
     )
 `); // pixels[x, y, color]
 db.exec(`
@@ -32,7 +32,7 @@ db.exec(`
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         x INTEGER NOT NULL,
         y INTEGER NOT NULL,
-        color TEXT NOT NULL,
+        color STRING NOT NULL,
         date STRING NOT NULL
     )
 `); // history
@@ -40,32 +40,53 @@ db.exec(`
 // CRUDs
 const loadPixels = () => {
     let table = db.prepare("SELECT x, y, color FROM pixels").all();
-    console.log(table);
+    console.log(`SELECT pixels: ${table}\n`);
     return table;
 }
 
 const savePixel = (x, y, color) => {
     let date = new Date();
     let date_string = date.toISOString();
-    db.prepare(`
-        INSERT INTO history (x, y, color, date)
-        VALUES (@x, @y, @color, @date)
-    `).run({
+    let dico = {
         "x": x,
         "y": y,
         "color": color,
         "date": date_string
-    });
+    };
+
+    // historique
     db.prepare(`
-        UPDATE pixels SET (@x, @y, @color) WHERE x = @x AND y = @y
-        If(@@ROWCOUNT=0)
-        INSERT INTO pixels VALUES (@x, @y, @color)
-    `).run({
-        "x": x,
-        "y": y,
-        "color": color
-    });
-    console.log(`savePixel(${x}, ${y}, ${color})`);
+        INSERT INTO history (x, y, color, date)
+        VALUES (@x, @y, @color, @date)
+    `).run(dico);
+    console.log(`INSERT INTO history (${x}, ${y}, ${color}, ${date})`);
+
+    // grille actuelle
+    let pixel = db.prepare(`
+        SELECT * FROM pixels WHERE x = @x AND y = @y
+    `).all(dico);
+    console.log(`pixel: ${JSON.stringify(pixel)}`);
+
+    if (pixel[0]) {
+        db.prepare(`
+            UPDATE pixels SET color = @color
+            WHERE x = @x AND y = @y
+        `).run(dico);
+        console.log(`UPDATE pixels (${x}, ${y}, ${color})`);
+    } else {
+        db.prepare(`
+            INSERT INTO pixels (x, y, color)
+            VALUES (@x, @y, @color)
+        `).run({
+            "x": x,
+            "y": y,
+            "color": color
+        });
+        console.log(`INSERT INTO pixels (${x}, ${y}, ${color})`);
+    }
+
+    // log
+    console.log(`savePixel(${x}, ${y}, ${color})\n`);
 };
 
 
@@ -81,7 +102,7 @@ io.on('connection', (socket) => {
     });
 
     socket.on('disconnect', () => {
-        console.log('Un utilisateur s\'est déconnecté');
+        console.log("Un utilisateur s'est déconnecté");
     });
 });
 
