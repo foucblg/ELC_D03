@@ -6,6 +6,7 @@ const Database = require('better-sqlite3');
 const uuid = require('uuid');
 const cookieParser = require('cookie-parser');
 const cookie = require("cookie");
+const { strict } = require('assert');
 
 // Variables globales
 const app = express();
@@ -72,105 +73,112 @@ function hash(str) {
 // CRUDs
 const loadPixels = () => {
     let table = db.prepare("SELECT x, y, color FROM pixel").all();
-    console.log(`SELECT pixel: ${JSON.stringify(table)}\n`);
+    console.log(`CRUD loadPixel (début et fin) < ${JSON.stringify(table)}\n`);
     return table;
 }
 
 const placePixel = (x, y, color, token) => {
     let date = new Date();
-    let date_string = date.toISOString();
-    user_id = get_user_id_by_token(token);
-    if (user_id) {
-        let dico = {
-            "x": x,
-            "y": y,
-            "color": color,
-            "user_id": user_id,
-            "date": date_string
-        };
+    let dateString = date.toISOString();
+    let userId = getUserIdByToken(token);
+    let dico = {
+        "x": x,
+        "y": y,
+        "color": color,
+        "user_id": userId,
+        "date": dateString
+    };
+    if (userId) {
+        console.log(`CRUD placePixel (début) > ${JSON.stringify(dico)}`)
 
         // historique
         db.prepare(`
             INSERT INTO history (x, y, color, user_id, date)
             VALUES (@x, @y, @color, @user_id, @date)
         `).run(dico);
-        console.log(`INSERT INTO history ${JSON.stringify(dico)}`);
+        console.log(`CRUD placePixel > INSERT INTO history ${JSON.stringify(dico)}`);
 
         // grille actuelle
         let pixel = db.prepare(`
             SELECT * FROM pixel WHERE x = @x AND y = @y
         `).get(dico);
-        console.log(`pixel: ${JSON.stringify(pixel)}`);
+        console.log(`CRUD placePixel < pixel: ${JSON.stringify(pixel)}`);
 
         if (pixel) {
             db.prepare(`
                 UPDATE pixel SET color = @color
                 WHERE x = @x AND y = @y
             `).run(dico);
-            console.log(`UPDATE pixel (${x}, ${y}, ${color})`);
+            console.log(`CRUD placePixel > UPDATE pixel (${x}, ${y}, ${color})`);
         } else {
             db.prepare(`
                 INSERT INTO pixel (x, y, color)
                 VALUES (@x, @y, @color)
             `).run(dico);
-            console.log(`INSERT INTO pixel (${x}, ${y}, ${color})`);
+            console.log(`CRUD placePixel > INSERT INTO pixel (${x}, ${y}, ${color})`);
         }
         // log
-    console.log(`placePixel(${JSON.stringify(dico)})\n`);
+        console.log(`CRUD placePixel (fin) < réussi > ${JSON.stringify(dico)}\n`);
+        return true
     } else {
-        console.log("placePixel : pas de user pr ce token")
+        return false
     }
 };
 
-const create_user = (username, password) => {
-    let hash_password = hash(password);
+const createUser = (username, password) => {
+    console.log(`CRUD createUser (début) > ${username}`)
+    let hashPassword = hash(password);
     let user = db.prepare(`
         SELECT * FROM user
         WHERE username = @username
     `).get({"username": username});
     if (user) {
         // username déjà pris
+        console.log(`CRUD createUser (fin) < username déjà pris > ${username}`)
     } else {
-        user_id = uuid.v4().toString().slice(-12);
+        let userId = uuid.v4().toString().slice(-12);
         db.prepare(`
             INSERT INTO user (id, username, hash_password)
             VALUES (@id, @username, @hash_password)
         `).run({
-            "id": user_id,
+            "id": userId,
             "username": username,
-            "hash_password": hash_password
+            "hash_password": hashPassword
         });
         db.prepare(`
             INSERT INTO access_token (user_id)
             VALUES (@user_id)
-        `).run({"user_id": user_id});
+        `).run({"user_id": userId});
+        console.log(`CRUD createUser (fin) < réussi > ${username}`)
     }
 }
 
-const get_user_id_by_token = (token) => {
+const getUserIdByToken = (token) => {
     access = db.prepare(`
         SELECT user_id FROM access_token
         WHERE token = @token
     `).get({"token": token});
     if (access) {
+        console.log(`CRUD getUserIdByToken (début et fin) < réussi ${access.user_id} > ${token}`)
         return access.user_id
     }
+    console.log(`CRUD getUserIdByToken (début et fin) < pas de user pr ce token > ${token}`)
 };
 
 const login = (username, password) => {
-    let hash_password = hash(password);
+    let hashPassword = hash(password);
     user = db.prepare(`
         SELECT id FROM user
         WHERE username = @username
         AND hash_password = @hash_password
     `).get({
         "username": username,
-        "hash_password": hash_password
+        "hash_password": hashPassword
     })
+    
     if (user) {
         token = uuid.v4().toString().slice(-12);
-        console.log(token);
-        console.log(user);
+        console.log(`CRUD login (début) < user ${user.id} > ${username}`)
         db.prepare(`
             UPDATE access_token SET token = @token
             WHERE user_id = @user_id
@@ -178,8 +186,10 @@ const login = (username, password) => {
             "token": token,
             "user_id": user.id
         });
+        console.log(`CRUD login (fin) < token ${token} > ${username}`)
         return token;
     } else {
+        console.log(`CRUD login (début et fin) < pas de user > ${username}`)
         return null;
     }
 };
@@ -189,6 +199,7 @@ const logout = (token) => {
         DELETE FROM access_token
         WHERE token = @token
     `).run({"token": token})
+    console.log(`CRUD logout (début et fin) > ${token}`)
 }
 
 
@@ -196,56 +207,67 @@ const logout = (token) => {
 app.post('/login', (request, response) => {
     let cookie = request.cookies.access_token;
     if (cookie === undefined) {
-        console.log("on va mettre un cookie")
         let username = request.body.username;
         let password = request.body.password;
-        console.log(username)
         let token = login(username, password);
+        console.log(`Endpoint login (début et fin) < ok (pas encore de cookie) > ${username}`)
         if (token) {
             response.cookie('access_token', token, { maxAge: 2592000, httpOnly: true })
             response.send('Cookie set successfully');
         } else {
             response.send('No cookie to set');
         }
+    } else {
+        console.log(`Endpoint login (début et fin) < ko (déjà un cookie ${cookie}) > ${request.body.username}`)
     }
   });
 
 app.post("/logout", (request, response) => {
-    let token = request.cookies.access_token;
+    let cookie = request.cookies.access_token;
     if (cookie !== undefined) {
         logout(token);
+        console.log(`Endpoint logout (début et fin) < ok (cookie existant à suppr ${cookie})`)
         response.clearCookie('access_token');
         response.send('Cookie deleted successfully');
+    } else {
+        console.log(`Endpoint logout (début et fin) < ko (pas de cookie à suppr)`)
+        response.send('No cookie to delete');
     }
-    response.send('No cookie to delete');
 })
 
 // Websockets
 io.on('connection', (socket) => {
-    console.log('Un utilisateur s\'est connecté');
+    console.log('WS co');
+    let token = null;
     if (socket.handshake.headers.cookie) {
-        let token = cookie.parse(socket.handshake.headers.cookie).access_token;
-        console.log(token);
-        console.log("Son user_id :")
-        console.log(get_user_id_by_token(token))
-        socket.on('placePixel', ({ x, y, color }) => {
-            console.log()
-            placePixel(x, y, color, token);
-            io.emit('placePixel', { x, y, color });
-        });
+        token = cookie.parse(socket.handshake.headers.cookie).access_token;
+        console.log(`WS token < ${token}, userId ${getUserIdByToken(token)}`)
     }
+
+    socket.on('placePixelInDB', ({ x, y, color }) => {
+        console.log(`WS placePixel < reçu > ${JSON.stringify({ x, y, color })}`)
+        if (token) {
+            if (placePixel(x, y, color, token)) {
+                io.emit('placePixelOnScreen', { x, y, color });
+                console.log(`WS placePixel < émis > ${JSON.stringify({ x, y, color, token })}`)
+            }
+        } else {
+            console.log(`WS placePixel < refus d'émettre (pas de token) > ${JSON.stringify({ x, y, color })}`);
+        }
+        
+    });
     
     socket.emit('loadPixels', loadPixels()); // TODO : ne le faire que si la page a jms été chargée
 
     socket.on('disconnect', () => {
-        console.log("Un utilisateur s'est déconnecté");
+        console.log("WS déco");
     });
 });
 
 // Run serveur
-create_user("admin", "admin");
-create_user("Marco", "zxcvbn");
-create_user("Fouco", "azerty");
+createUser("admin", "admin");
+createUser("Marco", "zxcvbn");
+createUser("Fouco", "azerty");
 
 server.listen(port, () => {
     console.log(`Serveur démarré sur http://${host}:${port}`);

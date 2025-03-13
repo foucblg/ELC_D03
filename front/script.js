@@ -32,7 +32,7 @@ colorBoxes.forEach(function(box) {
     box.addEventListener("click", function() {
         if (id_clicked == -1) return;
         color_picked = box.getAttribute("data-color");
-        drawInCanvas(id_clicked);
+        //drawInCanvas(id_clicked);
         sendPixel(x, y, color_picked);
     });
 });
@@ -51,7 +51,7 @@ function selectCanvas(i, j) {
 }
 
 function sendPixel(x, y, color) {
-    socket.emit("placePixel", { x, y, color });
+    socket.emit("placePixelInDB", { x, y, color });
 }
 
 function drawPixel(x, y, color) {
@@ -84,7 +84,7 @@ socket.on("loadPixels", async (pixels) => {
     }
 });
 
-socket.on("placePixel", ({ x, y, color }) => {
+socket.on("placePixelOnScreen", ({ x, y, color }) => {
     color_picked = color;
     drawInCanvas(x * dim + y);
 });
