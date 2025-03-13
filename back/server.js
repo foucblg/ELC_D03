@@ -5,6 +5,7 @@ const { Server } = require('socket.io');
 const Database = require('better-sqlite3');
 const uuid = require('uuid');
 const cookieParser = require('cookie-parser');
+const cookie = require("cookie");
 
 // Variables globales
 const app = express();
@@ -37,12 +38,13 @@ db.exec(`
         x INTEGER NOT NULL,
         y INTEGER NOT NULL,
         color STRING NOT NULL,
+        user_id STRING NOT NULL REFERENCES user,
         date STRING NOT NULL
     )
 `);
 db.exec(`
     CREATE TABLE IF NOT EXISTS user (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        id STRING PRIMARY KEY,
         username STRING NOT NULL,
         hash_password INTEGER NOT NULL
     )
@@ -50,17 +52,9 @@ db.exec(`
 db.exec(`
     CREATE TABLE IF NOT EXISTS access_token (
         token STRING PRIMARY KEY,    
-        user_id INTEGER NOT NULL REFERENCES user
+        user_id STRING NOT NULL REFERENCES user
     )
 `)
-
-db.prepare(`
-    INSERT INTO user (username, hash_password)
-    VALUES (@username, @hash_password)
-`).run({
-    "username": "root",
-    "hash_password": hash("azerty")
-});
 
 // Utils
 
@@ -82,66 +76,86 @@ const loadPixels = () => {
     return table;
 }
 
-const savePixel = (x, y, color) => {
+const placePixel = (x, y, color, token) => {
     let date = new Date();
     let date_string = date.toISOString();
-    let dico = {
-        "x": x,
-        "y": y,
-        "color": color,
-        "date": date_string
-    };
+    user_id = get_user_id_by_token(token);
+    if (user_id) {
+        let dico = {
+            "x": x,
+            "y": y,
+            "color": color,
+            "user_id": user_id,
+            "date": date_string
+        };
 
-    // historique
-    db.prepare(`
-        INSERT INTO history (x, y, color, date)
-        VALUES (@x, @y, @color, @date)
-    `).run(dico);
-    console.log(`INSERT INTO history (${x}, ${y}, ${color}, ${date})`);
-
-    // grille actuelle
-    let pixel = db.prepare(`
-        SELECT * FROM pixel WHERE x = @x AND y = @y
-    `).all(dico);
-    console.log(`pixel: ${JSON.stringify(pixel)}`);
-
-    if (pixel[0]) {
+        // historique
         db.prepare(`
-            UPDATE pixel SET color = @color
-            WHERE x = @x AND y = @y
+            INSERT INTO history (x, y, color, user_id, date)
+            VALUES (@x, @y, @color, @user_id, @date)
         `).run(dico);
-        console.log(`UPDATE pixel (${x}, ${y}, ${color})`);
+        console.log(`INSERT INTO history ${JSON.stringify(dico)}`);
+
+        // grille actuelle
+        let pixel = db.prepare(`
+            SELECT * FROM pixel WHERE x = @x AND y = @y
+        `).get(dico);
+        console.log(`pixel: ${JSON.stringify(pixel)}`);
+
+        if (pixel) {
+            db.prepare(`
+                UPDATE pixel SET color = @color
+                WHERE x = @x AND y = @y
+            `).run(dico);
+            console.log(`UPDATE pixel (${x}, ${y}, ${color})`);
+        } else {
+            db.prepare(`
+                INSERT INTO pixel (x, y, color)
+                VALUES (@x, @y, @color)
+            `).run(dico);
+            console.log(`INSERT INTO pixel (${x}, ${y}, ${color})`);
+        }
+        // log
+    console.log(`placePixel(${JSON.stringify(dico)})\n`);
     } else {
-        db.prepare(`
-            INSERT INTO pixel (x, y, color)
-            VALUES (@x, @y, @color)
-        `).run(dico);
-        console.log(`INSERT INTO pixel (${x}, ${y}, ${color})`);
+        console.log("placePixel : pas de user pr ce token")
     }
-
-    // log
-    console.log(`savePixel(${x}, ${y}, ${color})\n`);
 };
 
 const create_user = (username, password) => {
     let hash_password = hash(password);
-    dico = {
-        "username": username,
-        "hash_password": hash_password
-    }
     let user = db.prepare(`
         SELECT * FROM user
         WHERE username = @username
-    `).all(dico);
-    if (user[0]) {
+    `).get({"username": username});
+    if (user) {
         // username déjà pris
     } else {
+        user_id = uuid.v4().toString().slice(-12);
         db.prepare(`
-            INSERT INTO user (username, password)
-            VALUES (@username, @hash_password)
-        `).run(dico);
+            INSERT INTO user (id, username, hash_password)
+            VALUES (@id, @username, @hash_password)
+        `).run({
+            "id": user_id,
+            "username": username,
+            "hash_password": hash_password
+        });
+        db.prepare(`
+            INSERT INTO access_token (user_id)
+            VALUES (@user_id)
+        `).run({"user_id": user_id});
     }
 }
+
+const get_user_id_by_token = (token) => {
+    access = db.prepare(`
+        SELECT user_id FROM access_token
+        WHERE token = @token
+    `).get({"token": token});
+    if (access) {
+        return access.user_id
+    }
+};
 
 const login = (username, password) => {
     let hash_password = hash(password);
@@ -149,10 +163,10 @@ const login = (username, password) => {
         SELECT id FROM user
         WHERE username = @username
         AND hash_password = @hash_password
-    `).all({
+    `).get({
         "username": username,
         "hash_password": hash_password
-    })[0]
+    })
     if (user) {
         token = uuid.v4().toString().slice(-12);
         console.log(token);
@@ -190,8 +204,9 @@ app.post('/login', (request, response) => {
         if (token) {
             response.cookie('access_token', token, { maxAge: 2592000, httpOnly: true })
             response.send('Cookie set successfully');
+        } else {
+            response.send('No cookie to set');
         }
-        response.send('No cookie to set');
     }
   });
 
@@ -208,13 +223,19 @@ app.post("/logout", (request, response) => {
 // Websockets
 io.on('connection', (socket) => {
     console.log('Un utilisateur s\'est connecté');
-
-    socket.emit('loadPixels', loadPixels());
-
-    socket.on('placePixel', ({ x, y, color }) => {
-        savePixel(x, y, color);
-        io.emit('placePixel', { x, y, color });
-    });
+    if (socket.handshake.headers.cookie) {
+        let token = cookie.parse(socket.handshake.headers.cookie).access_token;
+        console.log(token);
+        console.log("Son user_id :")
+        console.log(get_user_id_by_token(token))
+        socket.on('placePixel', ({ x, y, color }) => {
+            console.log()
+            placePixel(x, y, color, token);
+            io.emit('placePixel', { x, y, color });
+        });
+    }
+    
+    socket.emit('loadPixels', loadPixels()); // TODO : ne le faire que si la page a jms été chargée
 
     socket.on('disconnect', () => {
         console.log("Un utilisateur s'est déconnecté");
@@ -222,6 +243,10 @@ io.on('connection', (socket) => {
 });
 
 // Run serveur
+create_user("admin", "admin");
+create_user("Marco", "zxcvbn");
+create_user("Fouco", "azerty");
+
 server.listen(port, () => {
     console.log(`Serveur démarré sur http://${host}:${port}`);
 });
