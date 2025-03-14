@@ -60,19 +60,24 @@ function drawPixel(x, y, color) {
     ctx.fillStyle = color;
     ctx.fillRect(0, 0, size_px, size_px);
 }
-function drawInCanvas(id) {
-    let canvas = container.children[id];
-    let ctx = canvas.getContext("2d");
-
-    ctx.fillStyle = color_picked;
-    ctx.fillRect(0, 0, size_px+5, size_px+5);
-    canvas.style.border = `2px solid ${color_picked}`;
-    id_clicked = -1;
-    drawed = true;
-}
 
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms))
+}
+
+async function drawInCanvas(id) {
+    let canvas = container.children[id];
+    let ctx = canvas.getContext("2d");
+    id_clicked = -1;
+    drawed = true;
+
+    canvas.style.transition = "all 100ms linear";
+    canvas.style.background = color_picked;
+    canvas.style.border = `2px solid ${color_picked}`;
+    await sleep(99);
+    canvas.style.transition = "";
+    ctx.fillStyle = color_picked;
+    ctx.fillRect(0, 0, size_px+5, size_px+5);
 }
 
 socket.on("loadPixels", async (pixels) => {
