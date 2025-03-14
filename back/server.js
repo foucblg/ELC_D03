@@ -213,9 +213,9 @@ app.post('/login', (request, response) => {
         console.log(`Endpoint login (début et fin) < ok (pas encore de cookie) > ${username}`)
         if (token) {
             response.cookie('access_token', token, { maxAge: 2592000, httpOnly: true })
-            response.send('Cookie set successfully');
+            response.send(`Connecté en tant que ${username}`);
         } else {
-            response.send('No cookie to set');
+            response.send("Combinaison email / mot de passe invalide");
         }
     } else {
         console.log(`Endpoint login (début et fin) < ko (déjà un cookie ${cookie}) > ${request.body.username}`)
@@ -228,10 +228,10 @@ app.post("/logout", (request, response) => {
         logout(token);
         console.log(`Endpoint logout (début et fin) < ok (cookie existant à suppr ${cookie})`)
         response.clearCookie('access_token');
-        response.send('Cookie deleted successfully');
+        response.send("Déconnecté !");
     } else {
         console.log(`Endpoint logout (début et fin) < ko (pas de cookie à suppr)`)
-        response.send('No cookie to delete');
+        response.send("Vous n'étiez déjà pas connecté");
     }
 })
 
