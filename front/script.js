@@ -93,3 +93,24 @@ socket.on("placePixelOnScreen", ({ x, y, color }) => {
     color_picked = color;
     drawInCanvas(x * dim + y);
 });
+
+function getCookie(name) {
+    const value = `; ${document.cookie}`;
+    console.log(value);
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop().split(';').shift();
+    return null;
+}
+
+function checkLoginStatus() {
+    const isLoggedIn = getCookie('access_token');
+    if (isLoggedIn) {
+        document.getElementById('loginForm').style.display = 'none';
+    }
+    else {
+        document.getElementById('logoutForm').style.display = 'none';
+        document.getElementById('colorPicker').style.display = 'none';
+    }
+}
+
+window.onload = checkLoginStatus;

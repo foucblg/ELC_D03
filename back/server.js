@@ -212,7 +212,7 @@ app.post('/login', (request, response) => {
         let token = login(username, password);
         console.log(`Endpoint login (début et fin) < ok (pas encore de cookie) > ${username}`)
         if (token) {
-            response.cookie('access_token', token, { maxAge: 2592000, httpOnly: true })
+            response.cookie('access_token', token, { maxAge: 2592000 })
             response.send(`Connecté en tant que ${username}`);
         } else {
             response.send("Combinaison email / mot de passe invalide");
