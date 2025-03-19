@@ -71,6 +71,7 @@ function hash(str) {
 }
 
 // CRUDs
+
 const loadPixels = () => {
     let table = db.prepare("SELECT x, y, color FROM pixel").all();
     console.log(`CRUD loadPixel (début et fin) < ${JSON.stringify(table)}\n`);
@@ -154,7 +155,7 @@ const createUser = (username, password) => {
 }
 
 const getUserIdByToken = (token) => {
-    access = db.prepare(`
+    let access = db.prepare(`
         SELECT user_id FROM access_token
         WHERE token = @token
     `).get({"token": token});
@@ -163,6 +164,20 @@ const getUserIdByToken = (token) => {
         return access.user_id
     }
     console.log(`CRUD getUserIdByToken (début et fin) < pas de user pr ce token > ${token}`)
+};
+
+const getUsernameById = (userId) => {
+    let user = db.prepare(`
+        SELECT username FROM user
+        WHERE id = @id
+    `).get({"id": userId})
+    if (user) {
+        console.log(`CRUD getUsernameById (début) < ${user.username} > ${userId}`)
+        return user.username;
+    } else {
+        console.log(`CRUD getUsernameById (début et fin) < pas de user pr cet id > ${userId}`)
+        return null;
+    }
 };
 
 const login = (username, password) => {
@@ -177,7 +192,7 @@ const login = (username, password) => {
     })
     
     if (user) {
-        token = uuid.v4().toString().slice(-12);
+        let token = uuid.v4().toString().slice(-12);
         console.log(`CRUD login (début) < user ${user.id} > ${username}`)
         db.prepare(`
             UPDATE access_token SET token = @token
@@ -202,8 +217,8 @@ const logout = (token) => {
     console.log(`CRUD logout (début et fin) > ${token}`)
 }
 
-
 // Endpoints
+
 app.post('/login', (request, response) => {
     let cookie = request.cookies.access_token;
     if (cookie === undefined) {
@@ -215,17 +230,44 @@ app.post('/login', (request, response) => {
             response.cookie('access_token', token, { maxAge: 2592000 })
             response.send(`Connecté en tant que ${username}`);
         } else {
-            response.send("Combinaison email / mot de passe invalide");
+            response.send("Combinaison nom d'utilisateur / mot de passe invalide");
         }
     } else {
         console.log(`Endpoint login (début et fin) < ko (déjà un cookie ${cookie}) > ${request.body.username}`)
     }
   });
 
+app.get('/login-status', (request, response) => {
+    let cookie = request.cookies.access_token;
+    if (cookie === undefined) {
+        console.log(`Endpoint login-status (début et fin) < pas co > rien`)
+        response.send({
+            "logged": false,
+            "text": "Vous n'êtes pas connectés"
+        });
+    } else {
+        let userId = getUserIdByToken(cookie);
+        if (userId) {
+            let username = getUsernameById(userId);
+            console.log(`Endpoint login-status (début et fin) < ${username} > cookie ${cookie}`)
+            response.send({
+                "logged": true,
+                "text": `Connecté en tant que ${username}`
+            });
+        } else {
+            console.log(`Endpoint login-status (début et fin) < pas de user pr ce token > cookie ${cookie}`);
+            response.send({
+                "logged": false,
+                "text": "Vous n'êtes pas connectés"
+            });
+        }
+    }
+})
+
 app.post("/logout", (request, response) => {
     let cookie = request.cookies.access_token;
     if (cookie !== undefined) {
-        logout(token);
+        logout(cookie);
         console.log(`Endpoint logout (début et fin) < ok (cookie existant à suppr ${cookie})`)
         response.clearCookie('access_token');
         response.send("Déconnecté !");
@@ -236,25 +278,19 @@ app.post("/logout", (request, response) => {
 })
 
 // Websockets
+
 io.on('connection', (socket) => {
     console.log('WS co');
-    let token = null;
-    if (socket.handshake.headers.cookie) {
-        token = cookie.parse(socket.handshake.headers.cookie).access_token;
-        console.log(`WS token < ${token}, userId ${getUserIdByToken(token)}`)
-    }
-
-    socket.on('placePixelInDB', ({ x, y, color }) => {
-        console.log(`WS placePixel < reçu > ${JSON.stringify({ x, y, color })}`)
+    socket.on('placePixelInDB', ({ x, y, color, token }) => {
+        console.log(`WS placePixelInDB < reçu > ${JSON.stringify({ x, y, color, token })}`);
         if (token) {
             if (placePixel(x, y, color, token)) {
                 io.emit('placePixelOnScreen', { x, y, color });
-                console.log(`WS placePixel < émis > ${JSON.stringify({ x, y, color, token })}`)
+                console.log(`WS placePixelOnScreen < émis > ${JSON.stringify({ x, y, color, token })}`)
             }
         } else {
-            console.log(`WS placePixel < refus d'émettre (pas de token) > ${JSON.stringify({ x, y, color })}`);
+            console.log(`WS placePixel < refus d'émettre (pas de token) > ${JSON.stringify({ x, y, color, token })}`);
         }
-        
     });
     
     socket.emit('loadPixels', loadPixels()); // TODO : ne le faire que si la page a jms été chargée
@@ -265,10 +301,9 @@ io.on('connection', (socket) => {
 });
 
 // Run serveur
-createUser("admin", "admin");
-createUser("Marco", "zxcvbn");
-createUser("Fouco", "azerty");
-
+//createUser("admin", "admin");
+//createUser("Marco", "zxcvbn");
+//createUser("Fouco", "azerty");
 server.listen(port, () => {
     console.log(`Serveur démarré sur http://${host}:${port}`);
 });

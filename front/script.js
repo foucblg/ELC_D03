@@ -50,8 +50,20 @@ function selectCanvas(i, j) {
     drawed = false;
 }
 
+function getCookie(name) {
+    const value = `; ${document.cookie}`;
+    console.log(value);
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) {
+        const token = parts.pop().split(';').shift();
+        return token;
+    }
+    return null;
+}
+
 function sendPixel(x, y, color) {
-    socket.emit("placePixelInDB", { x, y, color });
+    const token = getCookie("access_token");
+    socket.emit("placePixelInDB", { x, y, color, token });
 }
 
 function drawPixel(x, y, color) {
@@ -94,22 +106,16 @@ socket.on("placePixelOnScreen", ({ x, y, color }) => {
     drawInCanvas(x * dim + y);
 });
 
-function getCookie(name) {
-    const value = `; ${document.cookie}`;
-    console.log(value);
-    const parts = value.split(`; ${name}=`);
-    if (parts.length === 2) return parts.pop().split(';').shift();
-    return null;
-}
 
-function checkLoginStatus() {
-    const isLoggedIn = getCookie('access_token');
+async function checkLoginStatus() {
+    const loginStatus = await fetch("/login-status");
+    const isLoggedIn = loginStatus.logged;
     if (isLoggedIn) {
         document.getElementById('loginForm').style.display = 'none';
     }
     else {
         document.getElementById('logoutForm').style.display = 'none';
-        document.getElementById('colorPicker').style.display = 'none';
+        //document.getElementById('colorPicker').style.display = 'none';
     }
 }
 
