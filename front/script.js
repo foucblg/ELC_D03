@@ -108,14 +108,16 @@ socket.on("placePixelOnScreen", ({ x, y, color }) => {
 
 
 async function checkLoginStatus() {
-    const loginStatus = await fetch("/login-status");
+    const res = await fetch("/login-status");
+    const loginStatus = await res.json();
     const isLoggedIn = loginStatus.logged;
+    document.getElementById('loginstatus').srcdoc = loginStatus.text;
     if (isLoggedIn) {
         document.getElementById('loginForm').style.display = 'none';
     }
     else {
         document.getElementById('logoutForm').style.display = 'none';
-        //document.getElementById('colorPicker').style.display = 'none';
+        document.getElementById('colorPicker').style.display = 'none';
     }
 }
 

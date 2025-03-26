@@ -22,8 +22,8 @@
         </div>
     </div>
     <div class="auth" id="auth">
-        <iframe name="douille" id="douille">Vous n'êtes pas connecté</iframe>
-        <form class="form" action="/login" method="post" target="douille" id="loginForm">
+        <iframe name="loginstatus" id="loginstatus"></iframe>
+        <form class="form" action="/login" method="post" id="loginForm">
             <input type="text" id="username" name="username" 
                 placeholder="Nom d'utilisateur..." required>
     
@@ -32,7 +32,7 @@
             
             <input type="submit" value="Se connecter">
         </form>
-        <form class="form" action="/logout" method="post" target="douille" id="logoutForm">
+        <form class="form" action="/logout" method="post" id="logoutForm">
             <input type="submit" value="Se déconnecter">
         </form>
     </div>

@@ -211,7 +211,8 @@ const login = (username, password) => {
 
 const logout = (token) => {
     db.prepare(`
-        DELETE FROM access_token
+        UPDATE access_token
+        SET token = NULL
         WHERE token = @token
     `).run({"token": token})
     console.log(`CRUD logout (début et fin) > ${token}`)
@@ -227,8 +228,8 @@ app.post('/login', (request, response) => {
         let token = login(username, password);
         console.log(`Endpoint login (début et fin) < ok (pas encore de cookie) > ${username}`)
         if (token) {
-            response.cookie('access_token', token, { maxAge: 2592000 })
-            response.send(`Connecté en tant que ${username}`);
+            response.cookie('access_token', token, { maxAge: 2592000 });
+            response.redirect('back');
         } else {
             response.send("Combinaison nom d'utilisateur / mot de passe invalide");
         }
@@ -243,7 +244,7 @@ app.get('/login-status', (request, response) => {
         console.log(`Endpoint login-status (début et fin) < pas co > rien`)
         response.send({
             "logged": false,
-            "text": "Vous n'êtes pas connectés"
+            "text": "Vous n'êtes pas connecté"
         });
     } else {
         let userId = getUserIdByToken(cookie);
@@ -270,7 +271,7 @@ app.post("/logout", (request, response) => {
         logout(cookie);
         console.log(`Endpoint logout (début et fin) < ok (cookie existant à suppr ${cookie})`)
         response.clearCookie('access_token');
-        response.send("Déconnecté !");
+        response.redirect('back');
     } else {
         console.log(`Endpoint logout (début et fin) < ko (pas de cookie à suppr)`)
         response.send("Vous n'étiez déjà pas connecté");
@@ -301,9 +302,9 @@ io.on('connection', (socket) => {
 });
 
 // Run serveur
-//createUser("admin", "admin");
-//createUser("Marco", "zxcvbn");
-//createUser("Fouco", "azerty");
+createUser("admin", "admin");
+createUser("Marco", "zxcvbn");
+createUser("Fouco", "azerty");
 server.listen(port, () => {
     console.log(`Serveur démarré sur http://${host}:${port}`);
 });
