@@ -230,7 +230,7 @@ app.post('/login', (request, response) => {
         let token = login(username, password);
         console.log(`Endpoint login (début et fin) < ok (pas encore de cookie) > ${username}`)
         if (token) {
-            response.cookie('access_token', token, { maxAge: 2592000 });
+            response.cookie('access_token', token, { maxAge: 2592000, httpOnly: true });
             response.redirect('back');
         } else {
             response.send("Combinaison nom d'utilisateur / mot de passe invalide");
@@ -306,15 +306,22 @@ app.post("/create-user", (request, response) => {
 
 io.on('connection', (socket) => {
     console.log('WS co');
-    socket.on('placePixelInDB', ({ x, y, color, token }) => {
-        console.log(`WS placePixelInDB < reçu > ${JSON.stringify({ x, y, color, token })}`);
+
+    let token = null;
+    if (socket.handshake.headers.cookie) {
+        token = cookie.parse(socket.handshake.headers.cookie).access_token;
+        console.log(`WS token < ${token}, userId ${getUserIdByToken(token)}`)
+    }
+
+    socket.on('placePixelInDB', ({ x, y, color }) => {
+        console.log(`WS placePixelInDB < reçu > ${JSON.stringify({ x, y, color })}`);
         if (token) {
             if (placePixel(x, y, color, token)) {
                 io.emit('placePixelOnScreen', { x, y, color });
                 console.log(`WS placePixelOnScreen < émis > ${JSON.stringify({ x, y, color, token })}`)
             }
         } else {
-            console.log(`WS placePixel < refus d'émettre (pas de token) > ${JSON.stringify({ x, y, color, token })}`);
+            console.log(`WS placePixel < refus d'émettre (pas de token) > ${JSON.stringify({ x, y, color })}`);
         }
     });
     

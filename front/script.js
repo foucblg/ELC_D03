@@ -50,20 +50,8 @@ function selectCanvas(i, j) {
     drawed = false;
 }
 
-function getCookie(name) {
-    const value = `; ${document.cookie}`;
-    console.log(value);
-    const parts = value.split(`; ${name}=`);
-    if (parts.length === 2) {
-        const token = parts.pop().split(';').shift();
-        return token;
-    }
-    return null;
-}
-
 function sendPixel(x, y, color) {
-    const token = getCookie("access_token");
-    socket.emit("placePixelInDB", { x, y, color, token });
+    socket.emit("placePixelInDB", { x, y, color });
 }
 
 function drawPixel(x, y, color) {
