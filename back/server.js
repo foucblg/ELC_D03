@@ -135,7 +135,8 @@ const createUser = (username, password) => {
     `).get({"username": username});
     if (user) {
         // username déjà pris
-        console.log(`CRUD createUser (fin) < username déjà pris > ${username}`)
+        console.log(`CRUD createUser (fin) < username déjà pris > ${username}`);
+        return false;
     } else {
         let userId = uuid.v4().toString().slice(-12);
         db.prepare(`
@@ -150,7 +151,8 @@ const createUser = (username, password) => {
             INSERT INTO access_token (user_id)
             VALUES (@user_id)
         `).run({"user_id": userId});
-        console.log(`CRUD createUser (fin) < réussi > ${username}`)
+        console.log(`CRUD createUser (fin) < réussi > ${username}`);
+        return true;
     }
 }
 
@@ -228,13 +230,28 @@ app.post('/login', (request, response) => {
         let token = login(username, password);
         console.log(`Endpoint login (début et fin) < ok (pas encore de cookie) > ${username}`)
         if (token) {
-            response.cookie('access_token', token, { maxAge: 2592000 });
+            response.cookie('access_token', token, { maxAge: 2592000, httpOnly: true });
             response.redirect('back');
         } else {
             response.send("Combinaison nom d'utilisateur / mot de passe invalide");
         }
     } else {
-        console.log(`Endpoint login (début et fin) < ko (déjà un cookie ${cookie}) > ${request.body.username}`)
+        console.log(`Endpoint login (début) < déjà un cookie ${cookie} > ${request.body.username}`)
+        let userId = getUserIdByToken(cookie);
+        if (userId) {
+            console.log(`Endpoint login (fin) < ko (déjà co via ce cookie valide : ${cookie}) > ${username}`);
+        } else {
+            let username = request.body.username;
+            let password = request.body.password;
+            let token = login(username, password);
+            console.log(`Endpoint login (fin) < ok (y a ${cookie} ms il est à personne) > ${username}`);
+            if (token) {
+                response.cookie('access_token', token, { maxAge: 2592000 });
+                response.redirect('back');
+            } else {
+                response.send("Combinaison nom d'utilisateur / mot de passe invalide");
+            }
+        }
     }
   });
 
@@ -278,23 +295,37 @@ app.post("/logout", (request, response) => {
     }
 })
 
+app.post("/create-user", (request, response) => {
+    let cookie = request.cookies.access_token;
+    if (cookie === undefined) {
+
+    }
+})
+
 // Websockets
 
 io.on('connection', (socket) => {
     console.log('WS co');
-    socket.on('placePixelInDB', ({ x, y, color, token }) => {
-        console.log(`WS placePixelInDB < reçu > ${JSON.stringify({ x, y, color, token })}`);
+
+    let token = null;
+    if (socket.handshake.headers.cookie) {
+        token = cookie.parse(socket.handshake.headers.cookie).access_token;
+        console.log(`WS token < ${token}, userId ${getUserIdByToken(token)}`)
+    }
+
+    socket.on('placePixelInDB', ({ x, y, color }) => {
+        console.log(`WS placePixelInDB < reçu > ${JSON.stringify({ x, y, color })}`);
         if (token) {
             if (placePixel(x, y, color, token)) {
                 io.emit('placePixelOnScreen', { x, y, color });
                 console.log(`WS placePixelOnScreen < émis > ${JSON.stringify({ x, y, color, token })}`)
             }
         } else {
-            console.log(`WS placePixel < refus d'émettre (pas de token) > ${JSON.stringify({ x, y, color, token })}`);
+            console.log(`WS placePixel < refus d'émettre (pas de token) > ${JSON.stringify({ x, y, color })}`);
         }
     });
     
-    socket.emit('loadPixels', loadPixels()); // TODO : ne le faire que si la page a jms été chargée
+    socket.emit('loadPixels', loadPixels()); // TODO: ne le faire que si la page a jms été chargée
 
     socket.on('disconnect', () => {
         console.log("WS déco");
