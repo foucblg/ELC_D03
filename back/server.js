@@ -295,12 +295,26 @@ app.post("/logout", (request, response) => {
     }
 })
 
-app.post("/create-user", (request, response) => {
+app.post('/create-user', (request, response) => {
     let cookie = request.cookies.access_token;
     if (cookie === undefined) {
-
+        let username = request.body.username;
+        let password = request.body.password;
+        let created = createUser(username, password);
+        console.log(`Endpoint create-user (début et fin) < ok (pas encore de cookie) > ${username}`)
+    } else {
+        console.log(`Endpoint create-user (début) < déjà un cookie ${cookie} > ${request.body.username}`)
+        let userId = getUserIdByToken(cookie);
+        if (userId) {
+            console.log(`Endpoint create-user (fin) < ko (déjà co via ce cookie valide : ${cookie}) > ${username}`);
+        } else {
+            let username = request.body.username;
+            let password = request.body.password;
+            let created = createUser(username, password);
+            console.log(`Endpoint create-user (fin) < ok (y a ${cookie} ms il est à personne) > ${username}`);
+        }
     }
-})
+});
 
 // Websockets
 
