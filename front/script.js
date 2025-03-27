@@ -20,8 +20,8 @@ for (let i = 0; i < dim; i++) {
         container.appendChild(canvas);
 
         canvas.addEventListener("click", (function(i, j) {
-            return function() {
-                selectCanvas(i, j);
+            return async function()  {
+                await selectCanvas(i, j);
             };
         })(i, j));
     }
@@ -32,38 +32,29 @@ colorBoxes.forEach(function(box) {
     box.addEventListener("click", function() {
         if (id_clicked == -1) return;
         color_picked = box.getAttribute("data-color");
-        //drawInCanvas(id_clicked);
         sendPixel(x, y, color_picked);
     });
 });
 
-function selectCanvas(i, j) {
-    console.log("oui");
-    if (!drawed && previous_id_clicked != -1) {
-        container.children[previous_id_clicked].style.border = "None";
+async function selectCanvas(i, j) {
+    const res = await fetch("/login-status");
+    const loginStatus = await res.json();
+    const isLoggedIn = loginStatus.logged;
+    if (isLoggedIn){
+        if (!drawed && previous_id_clicked != -1) {
+            container.children[previous_id_clicked].style.border = "None";
+        }
+        x = i;
+        y = j;
+        id_clicked = i*dim + j;
+        container.children[id_clicked].style.border = "2px solid red";
+        previous_id_clicked = id_clicked;
+        drawed = false;
     }
-    x = i;
-    y = j;
-    id_clicked = i*dim + j;
-    container.children[id_clicked].style.border = "2px solid red";
-    previous_id_clicked = id_clicked;
-    drawed = false;
-}
-
-function getCookie(name) {
-    const value = `; ${document.cookie}`;
-    console.log(value);
-    const parts = value.split(`; ${name}=`);
-    if (parts.length === 2) {
-        const token = parts.pop().split(';').shift();
-        return token;
-    }
-    return null;
 }
 
 function sendPixel(x, y, color) {
-    const token = getCookie("access_token");
-    socket.emit("placePixelInDB", { x, y, color, token });
+    socket.emit("placePixelInDB", { x, y, color });
 }
 
 function drawPixel(x, y, color) {
@@ -86,7 +77,6 @@ async function drawInCanvas(id) {
     canvas.style.transition = "all 100ms linear";
     canvas.style.background = color_picked;
     canvas.style.border = `2px solid ${color_picked}`;
-    await sleep(99);
     canvas.style.transition = "";
     ctx.fillStyle = color_picked;
     ctx.fillRect(0, 0, size_px+5, size_px+5);
@@ -97,13 +87,17 @@ socket.on("loadPixels", async (pixels) => {
         let {x, y, color} = pixels[i];
         color_picked = color;
         drawInCanvas(x * dim + y);
-        await sleep(100);
     }
 });
 
 socket.on("placePixelOnScreen", ({ x, y, color }) => {
     color_picked = color;
     drawInCanvas(x * dim + y);
+    sendMessage(`Pixel ${colorToString(color)} placé en x = ${x} et y = ${y}`);
+});
+
+socket.on("recieved_message", ({ user, text }) => {
+    sendMessage(`${user} : ${text}`);
 });
 
 
@@ -111,7 +105,7 @@ async function checkLoginStatus() {
     const res = await fetch("/login-status");
     const loginStatus = await res.json();
     const isLoggedIn = loginStatus.logged;
-    document.getElementById('loginstatus').srcdoc = loginStatus.text;
+    sendMessage(loginStatus.text);
     if (isLoggedIn) {
         document.getElementById('loginForm').style.display = 'none';
     }
@@ -121,4 +115,37 @@ async function checkLoginStatus() {
     }
 }
 
+async function history(){
+    const res = await fetch("/history");
+    const pixels = res.json();
+    for (let pixel of pixels){
+        color_picked = pixel.color
+        drawInCanvas(pixel.x*dim + pixel.y)
+        await sleep(100);
+    }
+}
+
+function sendMessage(text) {
+    const chatbox = document.getElementById('chatbox');
+    chatbox.innerHTML += text + "<br>";
+    chatbox.scrollTop = chatbox.scrollHeight;
+}
+function colorToString(color){
+    switch(color){
+        case "green":
+            return "vert";
+        case "red":
+            return "rouge";
+        case "blue":
+            return "bleu";
+        case "black":
+            return "noir";
+        case "white":
+            return "blanc";
+        case "orange":
+            return "orange";
+        default:
+            return "inconnue";
+    }
+}
 window.onload = checkLoginStatus;

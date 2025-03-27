@@ -38,7 +38,35 @@ canvas {
 input[type="text"],
 input[type="password"],
 input[type="submit"] {
-    width: 200px;
+    width: 250px;
     padding: 10px;
     margin: 5px 0;
+}
+.game{
+    margin: 1em;
+}
+.button{
+    width: 250px;
+    padding: 10px;
+    margin: 5px 35px;
+}
+
+.general{
+    display: flex;
+}
+
+@media screen and (max-width: 600px) {
+    .general{
+        flex-direction: column;
+        align-items: center;
+    }
+    input[type="text"],
+    input[type="password"],
+    input[type="submit"] {
+        width: 100%;
+    }
+    .button{
+        width: 100%;
+        margin: 5px 0;
+    }
 }
