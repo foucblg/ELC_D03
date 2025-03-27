@@ -83,8 +83,8 @@ async function drawInCanvas(id) {
 }
 
 socket.on("loadPixels", async (pixels) => {
-    for (let i = 0; i < pixels.length; i++) {
-        let {x, y, color} = pixels[i];
+    for (let pixel of pixels) {
+        let {x, y, color} = pixel;
         color_picked = color;
         drawInCanvas(x * dim + y);
     }
@@ -115,12 +115,13 @@ async function checkLoginStatus() {
     }
 }
 
-async function history(){
+async function history() {
     const res = await fetch("/history");
     const pixels = res.json();
-    for (let pixel of pixels){
-        color_picked = pixel.color
-        drawInCanvas(pixel.x*dim + pixel.y)
+    for (let pixel of pixels) {
+        let {x, y, color} = pixel;
+        color_picked = color;
+        drawInCanvas(x*dim + y);
         await sleep(100);
     }
 }

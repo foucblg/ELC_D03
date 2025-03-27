@@ -78,6 +78,12 @@ const loadPixels = () => {
     return table;
 }
 
+const history = () => {
+    let table = db.prepare("SELECT x, y, color, user_id, date FROM history").all();
+    console.log(`CRUD history (début et fin) < ${JSON.stringify(table)}\n`);
+    return table;
+}
+
 const placePixel = (x, y, color, token) => {
     let date = new Date();
     let dateString = date.toISOString();
@@ -293,13 +299,11 @@ app.post("/logout", (request, response) => {
         console.log(`Endpoint logout (début et fin) < ko (pas de cookie à suppr)`)
         response.send("Vous n'étiez déjà pas connecté");
     }
-})
+})  
 
-app.post("/create-user", (request, response) => {
-    let cookie = request.cookies.access_token;
-    if (cookie === undefined) {
-
-    }
+app.get("/history", (request, response) => {
+    response.send(history());
+    console.log("Endpoint history < ok")
 })
 
 // Websockets
