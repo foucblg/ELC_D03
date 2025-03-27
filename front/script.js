@@ -107,7 +107,7 @@ async function checkLoginStatus() {
     const isLoggedIn = loginStatus.logged;
     sendMessage(loginStatus.text);
     if (isLoggedIn) {
-        document.getElementById('loginForm').style.display = 'none';
+        document.getElementById('signForm').style.display = 'none';
     }
     else {
         document.getElementById('logoutForm').style.display = 'none';

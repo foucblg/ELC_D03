@@ -24,18 +24,20 @@
         </div>
         <div class="auth" id="auth">
             <div id="chatbox" style="width: 300px; height: 400px; overflow-y: auto; border: 1px solid #ccc; padding: 10px;"></div>
-            <form class="form" action="/login" method="post" id="loginForm">
+            <form class="form" method="post" id="signForm">
                 <input type="text" id="username" name="username" 
                     placeholder="Nom d'utilisateur..." required>
         
                 <input type="password" id="password" name="password" 
                     placeholder="Password..." required>
-                
-                <input type="submit" value="Créer un compte / Se connecter">
+                <div>
+                    <input type="submit" class="sign" formaction="/register" name="register" value="Créer un compte">
+                    <input type="submit" class="sign" formaction="/login" name="login" value="Se connecter">
+                </div>
             </form>
             
             <form class="form" action="/logout" method="post" id="logoutForm">
-                <input type="submit" value="Se déconnecter">
+                <input type="submit" class="logout" value="Se déconnecter">
             </form>
             <button class="button" onclick="history()">Voir l'histoire</button>
         </div>

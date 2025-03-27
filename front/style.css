@@ -29,15 +29,20 @@ canvas {
 }
 
 .form {
-    display: flex;
+    display: flex;  
     flex-direction: column;
     align-items: center;
     gap: 10px;
 }
 
+.sign {
+    width: 125px;
+    padding: 10px;
+    margin: 5px 10px;
+}
 input[type="text"],
 input[type="password"],
-input[type="submit"] {
+.logout {
     width: 250px;
     padding: 10px;
     margin: 5px 0;
