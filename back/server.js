@@ -228,6 +228,37 @@ const logout = (token) => {
 
 // Endpoints
 
+app.post('/register', (request, response) => {
+    let cookie = request.cookies.access_token;
+    if (cookie === undefined) {
+        let username = request.body.username;
+        let password = request.body.password;
+        let created = createUser(username, password);
+        console.log(`Endpoint register (début et fin) < ok (pas encore de cookie) > ${username}`);
+        if (created) {
+            response.send(`Compte ${username} créé avec succès !`);
+        } else {
+            response.send(`Le nom d'utilisateur ${username} est déjà pris !`)
+        }
+    } else {
+        console.log(`Endpoint register (début) < déjà un cookie ${cookie} > ${request.body.username}`)
+        let userId = getUserIdByToken(cookie);
+        if (userId) {
+            console.log(`Endpoint register (fin) < ko (déjà co via ce cookie valide : ${cookie}) > ${username}`);
+        } else {
+            let username = request.body.username;
+            let password = request.body.password;
+            let created = createUser(username, password);
+            console.log(`Endpoint register (fin) < ok (y a ${cookie} ms il est à personne) > ${username}`);
+            if (created) {
+                response.send(`Compte ${username} créé avec succès !`);
+            } else {
+                response.send(`Le nom d'utilisateur ${username} est déjà pris !`)
+            }
+        }
+    }
+});
+
 app.post('/login', (request, response) => {
     let cookie = request.cookies.access_token;
     if (cookie === undefined) {
@@ -259,7 +290,7 @@ app.post('/login', (request, response) => {
             }
         }
     }
-  });
+});
 
 app.get('/login-status', (request, response) => {
     let cookie = request.cookies.access_token;
