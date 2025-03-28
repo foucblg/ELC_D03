@@ -18,7 +18,7 @@ app.use(express.json())
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser())
 app.use(express.static('front/'));
-const db = new Database('back/pixels.db');
+const db = new Database('back/db/pixels.db');
 
 // .env
 const host = process.env.HOST || 'localhost';

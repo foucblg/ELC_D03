@@ -1,0 +1,18 @@
+services:
+  rplace:
+    image: rplace:0.1
+    container_name: rplace
+    hostname: rplace
+    restart: unless-stopped
+    volumes:
+      - ./db:/rplace/back/db
+    env_file: .env
+    networks:
+      - rplace-backend
+    ports:
+      - 443:3000
+
+networks:
+  rplace-backend:
+    name: rplace-backend
+    external: true

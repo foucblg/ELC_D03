@@ -2,7 +2,7 @@
 Dockerfile
 
 back/.env
-back/pixels.db
+back/db
 
 node_modules
 
