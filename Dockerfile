@@ -7,4 +7,4 @@ COPY . .
 
 EXPOSE 3000
 
-CMD ["node", "node back/server.js"]
+CMD ["node", "back/server.js"]
