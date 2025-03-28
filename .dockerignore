@@ -1,10 +1,12 @@
 .dockerignore
 Dockerfile
+compose/
 
-back/.env
-back/db
+**/*.env*
+back/db/
 
-node_modules
+node_modules/
 
-*.md
-.gitignore
+**/*.md
+**/*.gitignore
+.git/
