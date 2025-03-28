@@ -1,0 +1,10 @@
+.dockerignore
+Dockerfile
+
+back/.env
+back/pixels.db
+
+node_modules
+
+*.md
+.gitignore
