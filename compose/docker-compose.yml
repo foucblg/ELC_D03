@@ -1,6 +1,6 @@
 services:
   rplace:
-    image: rplace:0.2
+    image: rplace:1.0
     container_name: rplace
     hostname: rplace
     restart: unless-stopped
