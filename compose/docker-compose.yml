@@ -8,4 +8,4 @@ services:
       - ./db:/rplace/back/db
     env_file: .env
     ports:
-      - 80:3000
+      - 3080:3000
