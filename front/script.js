@@ -53,6 +53,24 @@ async function selectCanvas(i, j) {
     }
 }
 
+// https://dev.to/inezabonte/how-to-make-a-mini-messenger-with-javascript-for-beginners-mm3
+const messageForm = document.getElementById('messageForm');
+messageForm.addEventListener('submit', event => {
+    event.preventDefault();
+
+    //input to save the message itself
+    const input = document.getElementById('textBox');
+
+    //This helps us to detect empty messages and ignore them
+    const text = input.value.trim();
+
+    if(text !== ''){
+        sendMessage(text);
+        input.value = '';
+        input.focus();
+    }
+});
+
 function sendPixel(x, y, color) {
     socket.emit("placePixelInDB", { x, y, color });
 }
