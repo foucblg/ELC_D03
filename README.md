@@ -13,13 +13,13 @@ Dans `backend`, dupliquer `.env.template` en `.env`, et mettre les bonnes valeur
 #### Windows
 
 ```sh
-node .\back\server.js
+node --env-file=back\.env .\back\server.js
 ```
 
 #### Autre (Unix-based)
 
 ```sh
-node back/server.js
+node --env-file=back\.env back/server.js
 ```
 
 ### Build l'image Docker du projet
