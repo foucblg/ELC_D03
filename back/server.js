@@ -56,6 +56,14 @@ db.exec(`
         user_id STRING NOT NULL REFERENCES user
     )
 `)
+db.exec(`
+    CREATE TABLE IF NOT EXISTS message (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        text TEXT NOT NULL,
+        user_id STRING NOT NULL REFERENCES user,
+        date STRING NOT NULL
+    )
+`)
 
 // Utils
 
@@ -74,13 +82,19 @@ function hash(str) {
 
 const loadPixels = () => {
     let table = db.prepare("SELECT x, y, color FROM pixel").all();
-    console.log(`CRUD loadPixel (début et fin) < ${JSON.stringify(table)}\n`);
+    console.log(`CRUD loadPixels (début et fin) < ${JSON.stringify(table)}\n`);
     return table;
 }
 
 const history = () => {
     let table = db.prepare("SELECT x, y, color, user_id, date FROM history").all();
     console.log(`CRUD history (début et fin) < ${JSON.stringify(table)}\n`);
+    return table;
+}
+
+const loadMessages = () => {
+    let table = db.prepare("SELECT text, user_id, date FROM message").all();
+    console.log(`CRUD loadMessages (début et fin) < ${JSON.stringify(table)}\n`);
     return table;
 }
 
@@ -126,6 +140,27 @@ const placePixel = (x, y, color, token) => {
         }
         // log
         console.log(`CRUD placePixel (fin) < réussi > ${JSON.stringify(dico)}\n`);
+        return true
+    } else {
+        return false
+    }
+};
+
+const placeMessage = (text, token) => {
+    let date = new Date();
+    let dateString = date.toISOString();
+    let userId = getUserIdByToken(token);
+    let dico = {
+        "text": text,
+        "user_id": userId,
+        "date": dateString
+    };
+    if (userId) {
+        db.prepare(`
+            INSERT INTO message (text, user_id, date)
+            VALUES (@text, @user_id, @date)
+        `).run(dico);
+        console.log(`CRUD placeMessage (début et fin) < réussi > ${JSON.stringify(dico)}`);
         return true
     } else {
         return false
@@ -352,6 +387,11 @@ io.on('connection', (socket) => {
         console.log(`WS placePixelInDB < reçu > ${JSON.stringify({ x, y, color })}`);
         if (token) {
             if (placePixel(x, y, color, token)) {
+                username = getUsernameById(getUserIdByToken(token));
+                text = `Pixel ${color} placé en x = ${x} et y = ${y} par ${username}`;
+                if (placeMessage(text, token)) {
+                    io.emit('placeMessageOnScreen', { text });
+                }
                 io.emit('placePixelOnScreen', { x, y, color });
                 console.log(`WS placePixelOnScreen < émis > ${JSON.stringify({ x, y, color, token })}`)
             }
@@ -359,8 +399,22 @@ io.on('connection', (socket) => {
             console.log(`WS placePixel < refus d'émettre (pas de token) > ${JSON.stringify({ x, y, color })}`);
         }
     });
+
+    socket.on('placeMessageInDB', ({ text }) => {
+        console.log(`WS placeMessageInDB < reçu > ${text}`);
+        if (token) {
+            if (placeMessage(text, token)) {
+                //username = getUsernameById(getUserIdByToken(token));
+                io.emit('placeMessageOnScreen', { text });
+                console.log(`WS placeMessageOnScreen < émis > ${JSON.stringify({ text, token })}`)
+            }
+        } else {
+            console.log(`WS placeMessage < refus d'émettre (pas de token) > ${text}`);
+        }
+    });
     
     socket.emit('loadPixels', loadPixels()); // TODO: ne le faire que si la page a jms été chargée
+    socket.emit('loadMessages', loadMessages());
 
     socket.on('disconnect', () => {
         console.log("WS déco");

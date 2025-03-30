@@ -57,11 +57,21 @@ function sendPixel(x, y, color) {
     socket.emit("placePixelInDB", { x, y, color });
 }
 
+function sendMessage(text) {
+    socket.emit("placeMessageInDB", { text });
+}
+
 function drawPixel(x, y, color) {
     let canvas = container.children[x * dim + y];
     let ctx = canvas.getContext("2d");
     ctx.fillStyle = color;
     ctx.fillRect(0, 0, size_px, size_px);
+}
+
+function showMessage(text) {
+    const chatbox = document.getElementById('chatbox');
+    chatbox.innerHTML += text + "<br>";
+    chatbox.scrollTop = chatbox.scrollHeight;
 }
 
 function sleep(ms) {
@@ -93,19 +103,24 @@ socket.on("loadPixels", async (pixels) => {
 socket.on("placePixelOnScreen", ({ x, y, color }) => {
     color_picked = color;
     drawInCanvas(x * dim + y);
-    sendMessage(`Pixel ${colorToString(color)} placé en x = ${x} et y = ${y}`);
 });
 
-socket.on("recieved_message", ({ user, text }) => {
-    sendMessage(`${user} : ${text}`);
+socket.on("loadMessages", async (messages) => {
+    for (let message of messages) {
+        let {text} = message;
+        showMessage(text);
+    }
 });
 
+socket.on("placeMessageOnScreen", ({ text }) => {
+    showMessage(text);
+});
 
 async function checkLoginStatus() {
     const res = await fetch("/login-status");
     const loginStatus = await res.json();
     const isLoggedIn = loginStatus.logged;
-    sendMessage(loginStatus.text);
+    // TODO: faire apparaître loginStatus.text qq part sur la page
     if (isLoggedIn) {
         document.getElementById('signForm').style.display = 'none';
     }
@@ -126,11 +141,6 @@ async function history() {
     }
 }
 
-function sendMessage(text) {
-    const chatbox = document.getElementById('chatbox');
-    chatbox.innerHTML += text + "<br>";
-    chatbox.scrollTop = chatbox.scrollHeight;
-}
 function colorToString(color){
     switch(color){
         case "green":
