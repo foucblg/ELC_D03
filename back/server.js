@@ -433,7 +433,7 @@ io.on('connection', (socket) => {
         if (token) {
             if (placePixel(x, y, color, token)) {
                 username = getUsernameById(getUserIdByToken(token));
-                text = `<i> Pixel ${colorToString(color)} placé en x = ${x} et y = ${y} </i>`;
+                text = `<i> Pixel ${colorToString(color)} placé en (${x}, ${y}) </i>`;
                 msg = placeMessage(text, token);
                 if (msg.success) {
                     io.emit('placeMessageOnScreen', msg);
