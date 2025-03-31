@@ -9,9 +9,9 @@ export function setupEndpoints(app){
             let created = createUser(username, password);
             console.log(`Endpoint register (début et fin) < ok (pas encore de cookie) > ${username}`);
             if (created) {
-                response.send(`Compte ${username} créé avec succès !`);
+                response.redirect(`/?login-message=Compte ${username} créé avec succès !`);
             } else {
-                response.send(`Le nom d'utilisateur ${username} est déjà pris !`)
+                response.redirect(`/?login-message=Le nom d'utilisateur ${username} est déjà pris !`)
             }
         } else {
             console.log(`Endpoint register (début) < déjà un cookie ${cookie} > ${request.body.username}`)
@@ -24,9 +24,9 @@ export function setupEndpoints(app){
                 let created = createUser(username, password);
                 console.log(`Endpoint register (fin) < ok (y a ${cookie} ms il est à personne) > ${username}`);
                 if (created) {
-                    response.send(`Compte ${username} créé avec succès !`);
+                    response.redirect(`/?login-message=Compte ${username} créé avec succès !`);
                 } else {
-                    response.send(`Le nom d'utilisateur ${username} est déjà pris !`)
+                    response.redirect(`/?login-message=Le nom d'utilisateur ${username} est déjà pris !`)
                 }
             }
         }
@@ -41,9 +41,9 @@ export function setupEndpoints(app){
             console.log(`Endpoint login (début et fin) < ok (pas encore de cookie) > ${username}`)
             if (token) {
                 response.cookie('access_token', token, { maxAge: 2592000, httpOnly: true });
-                response.redirect('back');
+                response.redirect(`/?login-message=Connecté en tant que ${username}`);
             } else {
-                response.send("Combinaison nom d'utilisateur / mot de passe invalide");
+                response.redirect("/?login-message=Combinaison nom d'utilisateur / mot de passe invalide");
             }
         } else {
             console.log(`Endpoint login (début) < déjà un cookie ${cookie} > ${request.body.username}`)
@@ -57,9 +57,9 @@ export function setupEndpoints(app){
                 console.log(`Endpoint login (fin) < ok (y a ${cookie} ms il est à personne) > ${username}`);
                 if (token) {
                     response.cookie('access_token', token, { maxAge: 2592000 });
-                    response.redirect('back');
+                    response.redirect(`/?login-message=Connecté en tant que ${username}`);
                 } else {
-                    response.send("Combinaison nom d'utilisateur / mot de passe invalide");
+                    response.redirect("/?login-message=Combinaison nom d'utilisateur / mot de passe invalide");
                 }
             }
         }
@@ -98,10 +98,10 @@ export function setupEndpoints(app){
             logout(cookie);
             console.log(`Endpoint logout (début et fin) < ok (cookie existant à suppr ${cookie})`)
             response.clearCookie('access_token');
-            response.redirect('back');
+            response.redirect("/?login-message=Déconnecté !");
         } else {
             console.log(`Endpoint logout (début et fin) < ko (pas de cookie à suppr)`)
-            response.send("Vous n'étiez déjà pas connecté");
+            response.redirect("/?login-message=Vous n'étiez déjà pas connecté");
         }
     })  
 
