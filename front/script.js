@@ -12,6 +12,11 @@ var x;
 var y;
 var mode = "direct"
 var isLoggedIn
+const params = new URLSearchParams(window.location.search);
+const status = params.get("status"); 
+if (status) {
+    document.getElementById('status').textContent = status;
+}
 // Création de la grille
 for (let i = 0; i < dim; i++) {
     for (let j = 0; j < dim; j++) {
