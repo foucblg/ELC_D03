@@ -149,9 +149,7 @@ socket.on("placeMessageOnScreen", (msg) => {
 
 async function checkLoginStatus() {
     const res = await fetch("/login-status");
-    const loginStatus = await res.json();
-    isLoggedIn = loginStatus.logged;
-    // TODO: faire apparaître loginStatus.text qq part sur la page
+    isLoggedIn = await res.json();
     if (isLoggedIn) {
         document.getElementById('signForm').style.display = 'none';
     }

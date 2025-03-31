@@ -69,25 +69,15 @@ export function setupEndpoints(app){
         let cookie = request.cookies.access_token;
         if (cookie === undefined) {
             console.log(`Endpoint login-status (début et fin) < pas co > rien`)
-            response.send({
-                "logged": false,
-                "text": "Vous n'êtes pas connecté"
-            });
+            response.send(false);
         } else {
             let userId = getUserIdByToken(cookie);
             if (userId) {
-                let username = getUsernameById(userId);
-                console.log(`Endpoint login-status (début et fin) < ${username} > cookie ${cookie}`)
-                response.send({
-                    "logged": true,
-                    "text": `Connecté en tant que ${username}`
-                });
+                console.log(`Endpoint login-status (début et fin) < ${userId} > cookie ${cookie}`)
+                response.send(true);
             } else {
                 console.log(`Endpoint login-status (début et fin) < pas de user pr ce token > cookie ${cookie}`);
-                response.send({
-                    "logged": false,
-                    "text": "Vous n'êtes pas connectés"
-                });
+                response.send(false);
             }
         }
     })

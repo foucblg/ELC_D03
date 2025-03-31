@@ -73,9 +73,6 @@ db.exec(`
 `)
 
 // Run serveur
-createUser("admin", "admin");
-createUser("Marco", "zxcvbn");
-createUser("Fouco", "azerty");
 server.listen(port, () => {
     console.log(`Serveur démarré sur http://${host}:${port}`);
 });
