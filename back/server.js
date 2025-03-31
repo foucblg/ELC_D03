@@ -4,7 +4,6 @@ import Database from 'better-sqlite3';
 import express from 'express';
 import { setupSocket } from './socket.js';
 import cookieParser from 'cookie-parser';
-import { createUser } from './cruds.js';
 import { setupEndpoints } from './endpoints.js';
 
 // Variables globales

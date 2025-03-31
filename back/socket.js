@@ -1,6 +1,6 @@
 import { Server } from "socket.io";
 import { colorToString } from './utils.js';
-import { placePixel, placeMessage, loadPixels, loadMessages, getUserIdByToken, getUsernameById } from './cruds.js';
+import { placePixel, placeMessage, loadPixels, loadMessages, getUserIdByToken } from './cruds.js';
 import cookie from 'cookie';
 
 export function setupSocket(server){

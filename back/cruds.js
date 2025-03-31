@@ -121,7 +121,7 @@ export const createUser = (username, password) => {
         console.log(`CRUD createUser (fin) < username déjà pris > ${username}`);
         return false;
     } else {
-        let userId = uuid.v4().toString().slice(-12);
+        let userId = uuidv4().toString().slice(-12);
         db.prepare(`
             INSERT INTO user (id, username, hash_password)
             VALUES (@id, @username, @hash_password)
