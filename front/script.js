@@ -10,8 +10,8 @@ var drawed = false;
 var previous_id_clicked = -1;
 var x;
 var y;
-var mode = "direct"
-var isLoggedIn
+var mode = "direct";
+var isLoggedIn;
 const params = new URLSearchParams(window.location.search);
 const status = params.get("status"); 
 if (status) {
@@ -104,7 +104,7 @@ function showMessage(msg) {
 }
 
 function sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms))
+    return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 async function drawInCanvas(id) {
@@ -193,7 +193,7 @@ async function history() {
 function switch_mode(){
     if (mode == "direct"){
         mode = "history";
-        history()
+        history();
     }
     else {
         mode = "direct";
