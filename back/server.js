@@ -120,10 +120,10 @@ const color = (x, y) => {
         "x": x,
         "y": y
     });
-    console.log(`CRUD color (début et fin) < ${JSON.stringify(pixel)}\n`);
     if (!pixel) {
         pixel = {"color": "white"};
     }
+    console.log(`CRUD color (début et fin) < ${JSON.stringify(pixel)} > ${x}, ${y}\n`);
     return pixel;
 }
 
@@ -463,7 +463,7 @@ io.on('connection', (socket) => {
         socket.emit('loadPixels', loadPixels());
     });
     
-    socket.emit('loadPixels', loadPixels()); // TODO: ne le faire que si la page a jms été chargée
+    socket.emit('loadPixels', loadPixels());
     socket.emit('loadMessages', loadMessages());
 
     socket.on('disconnect', () => {
