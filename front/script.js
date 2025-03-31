@@ -177,6 +177,10 @@ async function history() {
         drawInCanvas(x*dim + y);
         await sleep(50);
     }
+    mode = "direct"
+    document.getElementById('mode').textContent = "Voir l'histoire";
+    clear_grid();
+    socket.emit("askPixels");
 }
 
 
