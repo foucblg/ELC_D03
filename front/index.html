@@ -24,7 +24,7 @@
             </div>
         </div>
         <div class="chat" id="chat">
-            <div id="chatbox" style="width: 320px; height: 400px; overflow-y: auto; border: 1px solid #ccc; padding: 10px;"></div>
+            <div id="chatbox" style="width: 320px; height: 400px; overflow-x: clip; overflow-y: auto; border: 1px solid #ccc; padding: 10px;"></div>
             <form class="form" id="messageForm">
                 <input style="width: 275px;" type="text" class="textBox" id="textBox" placeholder="Message..." autofocus>
                 <button class="submit" style="width: 40px; height: 40px;"><i class="fas fa-arrow-up"></i></button>
@@ -46,7 +46,7 @@
             <form class="form" action="/logout" method="post" id="logoutForm">
                 <input type="submit" class="logout" value="Se déconnecter">
             </form>
-            <button class="button" id="mode" onclick="history()">Voir l'histoire</button>
+            <button class="button" id="mode" onclick="switch_mode()">Voir l'histoire</button>
         </div>
     </div>
 </body>

@@ -180,8 +180,9 @@ function switch_mode(){
     }
     else {
         mode = "direct";
+        document.getElementById('mode').textContent = "Voir l'histoire";
         clear_grid();
-        socket.emit('loadPixels');
+        // socket.emit('loadPixels');
     }
 }
 function clear_grid(){
