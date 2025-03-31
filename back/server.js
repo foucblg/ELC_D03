@@ -61,6 +61,7 @@ db.exec(`
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         text TEXT NOT NULL,
         user_id STRING NOT NULL REFERENCES user,
+        username STRING NOT NULL,
         date STRING NOT NULL
     )
 `)
@@ -127,7 +128,7 @@ const color = (x, y) => {
 }
 
 const loadMessages = () => {
-    let table = db.prepare("SELECT text, user_id, date FROM message").all();
+    let table = db.prepare("SELECT text, user_id, username, date FROM message").all();
     console.log(`CRUD loadMessages (début et fin) < ${JSON.stringify(table)}\n`);
     return table;
 }
@@ -184,21 +185,26 @@ const placeMessage = (text, token) => {
     let date = new Date();
     let dateString = date.toISOString();
     let userId = getUserIdByToken(token);
-    let dico = {
-        "text": text,
-        "user_id": userId,
-        "date": dateString
-    };
     if (userId) {
+        let username = getUsernameById(userId);
+        let dico = {
+            "text": text,
+            "user_id": userId,
+            "username": username,
+            "date": dateString
+        };
         db.prepare(`
-            INSERT INTO message (text, user_id, date)
-            VALUES (@text, @user_id, @date)
+            INSERT INTO message (text, user_id, username, date)
+            VALUES (@text, @user_id, @username, @date)
         `).run(dico);
-        console.log(`CRUD placeMessage (début et fin) < réussi > ${JSON.stringify(dico)}`);
-        return true
-    } else {
-        return false
+        let dico2 = {
+            "success": true,
+            ...dico
+        };
+        console.log(`CRUD placeMessage (début et fin) < réussi > ${JSON.stringify(dico2)}`);
+        return dico2;
     }
+    return {"success": false}
 };
 
 const createUser = (username, password) => {
@@ -427,9 +433,10 @@ io.on('connection', (socket) => {
         if (token) {
             if (placePixel(x, y, color, token)) {
                 username = getUsernameById(getUserIdByToken(token));
-                text = `<b>${username}</b> : <i> Pixel ${colorToString(color)} placé en x = ${x} et y = ${y} </i>`;
-                if (placeMessage(text, token)) {
-                    io.emit('placeMessageOnScreen', { text });
+                text = `<i> Pixel ${colorToString(color)} placé en x = ${x} et y = ${y} </i>`;
+                msg = placeMessage(text, token);
+                if (msg.success) {
+                    io.emit('placeMessageOnScreen', msg);
                 }
                 io.emit('placePixelOnScreen', { x, y, color });
                 console.log(`WS placePixelOnScreen < émis > ${JSON.stringify({ x, y, color, token })}`)
@@ -442,10 +449,10 @@ io.on('connection', (socket) => {
     socket.on('placeMessageInDB', ({ text }) => {
         console.log(`WS placeMessageInDB < reçu > ${text}`);
         if (token) {
-            if (placeMessage(text, token)) {
-                //username = getUsernameById(getUserIdByToken(token));
-                io.emit('placeMessageOnScreen', { text });
-                console.log(`WS placeMessageOnScreen < émis > ${JSON.stringify({ text, token })}`)
+            msg = placeMessage(text.replace(/<[^>]+>/g, ''), token);
+            if (msg.success) {
+                io.emit('placeMessageOnScreen', msg);
+                console.log(`WS placeMessageOnScreen < émis > ${JSON.stringify({ ...msg, token })}`)
             }
         } else {
             console.log(`WS placeMessage < refus d'émettre (pas de token) > ${text}`);

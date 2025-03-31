@@ -90,8 +90,12 @@ function drawPixel(x, y, color) {
     ctx.fillRect(0, 0, size_px, size_px);
 }
 
-function showMessage(text) {
+function showMessage(msg) {
+    console.log(JSON.stringify(msg));
     const chatbox = document.getElementById('chatbox');
+    date = new Date(msg.date);
+    dateString = date.toLocaleTimeString(navigator.language, {timeZone: "UTC", hour: '2-digit', minute:'2-digit'});
+    text = dateString + " <b>" + msg.username + "</b> " + msg.text;
     chatbox.innerHTML += text + "<br>";
     chatbox.scrollTop = chatbox.scrollHeight;
 }
@@ -131,14 +135,13 @@ socket.on("placePixelOnScreen", ({ x, y, color }) => {
 });
 
 socket.on("loadMessages", async (messages) => {
-    for (let message of messages) {
-        let {text} = message;
-        showMessage(text);
+    for (let msg of messages) {
+        showMessage(msg);
     }
 });
 
-socket.on("placeMessageOnScreen", ({ text }) => {
-    showMessage(text);
+socket.on("placeMessageOnScreen", (msg) => {
+    showMessage(msg);
 });
 
 async function checkLoginStatus() {
