@@ -13,9 +13,9 @@ var y;
 var mode = "direct";
 var isLoggedIn;
 const params = new URLSearchParams(window.location.search);
-const status = params.get("status"); 
-if (status) {
-    document.getElementById('status').textContent = status;
+const loginMessage = params.get("login-message"); 
+if (loginMessage) {
+    document.getElementById('status').textContent = loginMessage;
 }
 // Création de la grille
 for (let i = 0; i < dim; i++) {
