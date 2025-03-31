@@ -11,6 +11,7 @@ var previous_id_clicked = -1;
 var x;
 var y;
 var mode = "direct"
+var isLoggedIn
 // Création de la grille
 for (let i = 0; i < dim; i++) {
     for (let j = 0; j < dim; j++) {
@@ -39,9 +40,6 @@ colorBoxes.forEach(function(box) {
 });
 
 async function selectCanvas(i, j) {
-    const res = await fetch("/login-status");
-    const loginStatus = await res.json();
-    const isLoggedIn = loginStatus.logged;
     if (isLoggedIn && mode == "direct") {
         if (!drawed && previous_id_clicked != -1) {
             container.children[previous_id_clicked].style.border = `2px solid ${last_color}`;
@@ -147,7 +145,7 @@ socket.on("placeMessageOnScreen", (msg) => {
 async function checkLoginStatus() {
     const res = await fetch("/login-status");
     const loginStatus = await res.json();
-    const isLoggedIn = loginStatus.logged;
+    isLoggedIn = loginStatus.logged;
     // TODO: faire apparaître loginStatus.text qq part sur la page
     if (isLoggedIn) {
         document.getElementById('signForm').style.display = 'none';
