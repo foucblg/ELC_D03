@@ -11,9 +11,9 @@ export const app = express();
 const server = http.createServer(app);
 
 // Définition des chemins du front-end & back-end
-app.use(express.json())
+app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(cookieParser())
+app.use(cookieParser());
 app.use(express.static('front/'));
 
 //Start socket
@@ -54,13 +54,13 @@ db.exec(`
         username STRING NOT NULL,
         hash_password INTEGER NOT NULL
     )
-`)
+`);
 db.exec(`
     CREATE TABLE IF NOT EXISTS access_token (
         token STRING PRIMARY KEY,    
         user_id STRING NOT NULL REFERENCES user
     )
-`)
+`);
 db.exec(`
     CREATE TABLE IF NOT EXISTS message (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -69,7 +69,7 @@ db.exec(`
         username STRING NOT NULL,
         date STRING NOT NULL
     )
-`)
+`);
 
 // Run serveur
 server.listen(port, () => {

@@ -11,9 +11,8 @@ export function setupSocket(server){
 
         let token = null;
         if (socket.handshake.headers.cookie) {
-            console.log("ouiiiii")
             token = cookie.parse(socket.handshake.headers.cookie).access_token;
-            console.log(`WS token < ${token}, userId ${getUserIdByToken(token)}`)
+            console.log(`WS token < ${token}, userId ${getUserIdByToken(token)}`);
         }
 
         socket.on('placePixelInDB', ({ x, y, color }) => {
@@ -26,7 +25,7 @@ export function setupSocket(server){
                         io.emit('placeMessageOnScreen', msg);
                     }
                     io.emit('placePixelOnScreen', { x, y, color });
-                    console.log(`WS placePixelOnScreen < émis > ${JSON.stringify({ x, y, color, token })}`)
+                    console.log(`WS placePixelOnScreen < émis > ${JSON.stringify({ x, y, color, token })}`);
                 }
             } else {
                 console.log(`WS placePixel < refus d'émettre (pas de token) > ${JSON.stringify({ x, y, color })}`);
@@ -39,7 +38,7 @@ export function setupSocket(server){
                 let msg = placeMessage(text.replace(/<[^>]+>/g, ''), token);
                 if (msg.success) {
                     io.emit('placeMessageOnScreen', msg);
-                    console.log(`WS placeMessageOnScreen < émis > ${JSON.stringify({ ...msg, token })}`)
+                    console.log(`WS placeMessageOnScreen < émis > ${JSON.stringify({ ...msg, token })}`);
                 }
             } else {
                 console.log(`WS placeMessage < refus d'émettre (pas de token) > ${text}`);

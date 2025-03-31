@@ -47,7 +47,7 @@ export const placePixel = (x, y, color, token) => {
         "date": dateString
     };
     if (userId) {
-        console.log(`CRUD placePixel (début) > ${JSON.stringify(dico)}`)
+        console.log(`CRUD placePixel (début) > ${JSON.stringify(dico)}`);
 
         // historique
         db.prepare(`
@@ -77,11 +77,11 @@ export const placePixel = (x, y, color, token) => {
         }
         // log
         console.log(`CRUD placePixel (fin) < réussi > ${JSON.stringify(dico)}\n`);
-        return true
+        return true;
     } else {
-        return false
+        return false;
     }
-};
+}
 
 export const placeMessage = (text, token) => {
     let date = new Date();
@@ -106,11 +106,11 @@ export const placeMessage = (text, token) => {
         console.log(`CRUD placeMessage (début et fin) < réussi > ${JSON.stringify(dico2)}`);
         return dico2;
     }
-    return {"success": false}
-};
+    return {"success": false};
+}
 
 export const createUser = (username, password) => {
-    console.log(`CRUD createUser (début) > ${username}`)
+    console.log(`CRUD createUser (début) > ${username}`);
     let hashPassword = hash(password);
     let user = db.prepare(`
         SELECT * FROM user
@@ -145,25 +145,25 @@ export const getUserIdByToken = (token) => {
         WHERE token = @token
     `).get({"token": token});
     if (access) {
-        console.log(`CRUD getUserIdByToken (début et fin) < réussi ${access.user_id} > ${token}`)
-        return access.user_id
+        console.log(`CRUD getUserIdByToken (début et fin) < réussi ${access.user_id} > ${token}`);
+        return access.user_id;
     }
-    console.log(`CRUD getUserIdByToken (début et fin) < pas de user pr ce token > ${token}`)
-};
+    console.log(`CRUD getUserIdByToken (début et fin) < pas de user pr ce token > ${token}`);
+}
 
 export const getUsernameById = (userId) => {
     let user = db.prepare(`
         SELECT username FROM user
         WHERE id = @id
-    `).get({"id": userId})
+    `).get({"id": userId});
     if (user) {
-        console.log(`CRUD getUsernameById (début) < ${user.username} > ${userId}`)
+        console.log(`CRUD getUsernameById (début) < ${user.username} > ${userId}`);
         return user.username;
     } else {
-        console.log(`CRUD getUsernameById (début et fin) < pas de user pr cet id > ${userId}`)
+        console.log(`CRUD getUsernameById (début et fin) < pas de user pr cet id > ${userId}`);
         return null;
     }
-};
+}
 
 export const login = (username, password) => {
     let hashPassword = hash(password);
@@ -174,11 +174,11 @@ export const login = (username, password) => {
     `).get({
         "username": username,
         "hash_password": hashPassword
-    })
+    });
     
     if (user) {
         let token = uuidv4.toString().slice(-12);
-        console.log(`CRUD login (début) < user ${user.id} > ${username}`)
+        console.log(`CRUD login (début) < user ${user.id} > ${username}`);
         db.prepare(`
             UPDATE access_token SET token = @token
             WHERE user_id = @user_id
@@ -186,10 +186,10 @@ export const login = (username, password) => {
             "token": token,
             "user_id": user.id
         });
-        console.log(`CRUD login (fin) < token ${token} > ${username}`)
+        console.log(`CRUD login (fin) < token ${token} > ${username}`);
         return token;
     } else {
-        console.log(`CRUD login (début et fin) < pas de user > ${username}`)
+        console.log(`CRUD login (début et fin) < pas de user > ${username}`);
         return null;
     }
 };
@@ -199,6 +199,6 @@ export const logout = (token) => {
         UPDATE access_token
         SET token = NULL
         WHERE token = @token
-    `).run({"token": token})
-    console.log(`CRUD logout (début et fin) > ${token}`)
+    `).run({"token": token});
+    console.log(`CRUD logout (début et fin) > ${token}`);
 }

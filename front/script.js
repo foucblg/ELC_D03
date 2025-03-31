@@ -28,7 +28,7 @@ for (let i = 0; i < dim; i++) {
         container.appendChild(canvas);
 
         canvas.addEventListener("click", (function(i, j) {
-            return async function()  {
+            return async function() {
                 await selectCanvas(i, j);
             };
         })(i, j));
@@ -48,7 +48,6 @@ async function selectCanvas(i, j) {
     if (isLoggedIn && mode == "direct") {
         if (!drawed && previous_id_clicked != -1) {
             container.children[previous_id_clicked].style.border = `2px solid ${last_color}`;
-            
         }
         last_color = await get_pixel_color(i, j);
         x = i;
@@ -134,7 +133,6 @@ socket.on("placePixelOnScreen", ({ x, y, color }) => {
         color_picked = color;
         drawInCanvas(x * dim + y);
     }
-    
 });
 
 socket.on("loadMessages", async (messages) => {
@@ -152,8 +150,7 @@ async function checkLoginStatus() {
     isLoggedIn = await res.json();
     if (isLoggedIn) {
         document.getElementById('signForm').style.display = 'none';
-    }
-    else {
+    } else {
         document.getElementById('messageForm').style.display = 'none';
         document.getElementById('logoutForm').style.display = 'none';
         document.getElementById('colorPicker').style.display = 'none';
@@ -192,15 +189,15 @@ function switch_mode(){
     if (mode == "direct"){
         mode = "history";
         history();
-    }
-    else {
+    } else {
         mode = "direct";
         document.getElementById('mode').textContent = "Voir l'histoire";
         clear_grid();
         socket.emit("askPixels");
     }
 }
-function clear_grid(){
+
+function clear_grid() {
     for (let i = 0; i < dim; i++) {
         for (let j = 0; j < dim; j++) {
             let canvas = container.children[i*dim + j];
