@@ -9,6 +9,7 @@ var drawed = false;
 var previous_id_clicked = -1;
 var x;
 var y;
+var mode = "direct"
 // Création de la grille
 for (let i = 0; i < dim; i++) {
     for (let j = 0; j < dim; j++) {
@@ -40,9 +41,9 @@ async function selectCanvas(i, j) {
     const res = await fetch("/login-status");
     const loginStatus = await res.json();
     const isLoggedIn = loginStatus.logged;
-    if (isLoggedIn){
+    if (isLoggedIn && mode == "direct") {
         if (!drawed && previous_id_clicked != -1) {
-            container.children[previous_id_clicked].style.border = "None";
+            container.children[previous_id_clicked].style.border = `2px solid ${get_pixel_color(i,j)}`;
         }
         x = i;
         y = j;
@@ -119,8 +120,11 @@ socket.on("loadPixels", async (pixels) => {
 });
 
 socket.on("placePixelOnScreen", ({ x, y, color }) => {
-    color_picked = color;
-    drawInCanvas(x * dim + y);
+    if (mode == "direct") {
+        color_picked = color;
+        drawInCanvas(x * dim + y);
+    }
+    
 });
 
 socket.on("loadMessages", async (messages) => {
@@ -149,14 +153,46 @@ async function checkLoginStatus() {
     }
 }
 
+async function get_pixel_color(x, y) {
+    const res = await fetch(`/color/${x}/${y}`);
+    return await res.json();
+}
+
 async function history() {
     const res = await fetch("/history");
-    const pixels = res.json();
+    const pixels = await res.json();
+    clear_grid();
+    
+    document.getElementById('mode').textContent = "Retour au direct";
     for (let pixel of pixels) {
         let {x, y, color} = pixel;
         color_picked = color;
         drawInCanvas(x*dim + y);
-        await sleep(100);
+        await sleep(50);
+    }
+}
+
+
+function switch_mode(){
+    if (mode == "direct"){
+        mode = "history";
+        history()
+    }
+    else {
+        mode = "direct";
+        clear_grid();
+        socket.emit('loadPixels');
+    }
+}
+function clear_grid(){
+    for (let i = 0; i < dim; i++) {
+        for (let j = 0; j < dim; j++) {
+            let canvas = container.children[i*dim + j];
+            let ctx = canvas.getContext("2d");
+            canvas.style.border = "2px solid white";
+            ctx.fillStyle = "white";
+            ctx.fillRect(0, 0, size_px+5, size_px+5);
+        }
     }
 }
 
