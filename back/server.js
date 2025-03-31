@@ -111,6 +111,21 @@ const history = () => {
     return table;
 }
 
+const color = (x, y) => {
+    let pixel = db.prepare(`
+        SELECT color FROM pixel
+        WHERE x = @x AND y = @y
+    `).get({
+        "x": x,
+        "y": y
+    });
+    console.log(`CRUD color (début et fin) < ${JSON.stringify(pixel)}\n`);
+    if (!pixel) {
+        pixel = {"color": "white"};
+    }
+    return pixel;
+}
+
 const loadMessages = () => {
     let table = db.prepare("SELECT text, user_id, date FROM message").all();
     console.log(`CRUD loadMessages (début et fin) < ${JSON.stringify(table)}\n`);
@@ -389,6 +404,11 @@ app.post("/logout", (request, response) => {
 app.get("/history", (request, response) => {
     response.send(history());
     console.log("Endpoint history < ok")
+})
+
+app.get("/color/:x/:y", (request, response) => {
+    response.send(color(request.params.x, request.params.y));
+    console.log("Endpoint color < ok")
 })
 
 // Websockets

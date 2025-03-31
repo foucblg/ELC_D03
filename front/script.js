@@ -5,6 +5,7 @@ var id_clicked = -1;
 var container = document.getElementById("gridContainer");
 container.style.gridTemplateColumns = `repeat(${dim}, ${size_px+4}px)`;
 var color_picked = "green";
+var last_color = "white";
 var drawed = false;
 var previous_id_clicked = -1;
 var x;
@@ -43,8 +44,10 @@ async function selectCanvas(i, j) {
     const isLoggedIn = loginStatus.logged;
     if (isLoggedIn && mode == "direct") {
         if (!drawed && previous_id_clicked != -1) {
-            container.children[previous_id_clicked].style.border = `2px solid ${get_pixel_color(i,j)}`;
+            container.children[previous_id_clicked].style.border = `2px solid ${last_color}`;
+            
         }
+        last_color = await get_pixel_color(i, j);
         x = i;
         y = j;
         id_clicked = i*dim + j;
@@ -155,7 +158,8 @@ async function checkLoginStatus() {
 
 async function get_pixel_color(x, y) {
     const res = await fetch(`/color/${x}/${y}`);
-    return await res.json();
+    result = await res.json();
+    return result.color;
 }
 
 async function history() {
@@ -165,6 +169,9 @@ async function history() {
     
     document.getElementById('mode').textContent = "Retour au direct";
     for (let pixel of pixels) {
+        if (mode == "direct") {
+            break;
+        }
         let {x, y, color} = pixel;
         color_picked = color;
         drawInCanvas(x*dim + y);
