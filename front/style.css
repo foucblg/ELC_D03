@@ -60,18 +60,14 @@ input[type="password"],
     display: flex;
 }
 
+#messageForm{
+    display: contents;
+    margin: 10px;
+}
+
 @media screen and (max-width: 600px) {
     .general{
         flex-direction: column;
         align-items: center;
-    }
-    input[type="text"],
-    input[type="password"],
-    input[type="submit"] {
-        width: 100%;
-    }
-    .button{
-        width: 100%;
-        margin: 5px 0;
     }
 }

@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="style.css">
     <script src="/socket.io/socket.io.js"></script>
     <script defer src="script.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body style="width: 100%; display: flex">
     <div class="general">
@@ -26,7 +27,7 @@
             <div id="chatbox" style="width: 300px; height: 400px; overflow-y: auto; border: 1px solid #ccc; padding: 10px;"></div>
             <form class="form" id="messageForm">
                 <input type="text" class="textBox" id="textBox" placeholder="Message..." autofocus>
-                <button class="submit">Envoyer</button>
+                <button class="submit" style="width: 40px; height: 40px;"><i class="fas fa-arrow-up"></i></button>
             </form>
         </div>
         <div class="auth" id="auth">

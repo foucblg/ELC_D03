@@ -19,7 +19,7 @@ node --env-file=back\.env .\back\server.js
 #### Autre (Unix-based)
 
 ```sh
-node --env-file=back\.env back/server.js
+node --env-file=back/.env back/server.js
 ```
 
 ### Build l'image Docker du projet
