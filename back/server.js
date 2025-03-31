@@ -451,6 +451,10 @@ io.on('connection', (socket) => {
             console.log(`WS placeMessage < refus d'émettre (pas de token) > ${text}`);
         }
     });
+
+    socket.on('askPixels', () => {
+        socket.emit('loadPixels', loadPixels());
+    });
     
     socket.emit('loadPixels', loadPixels()); // TODO: ne le faire que si la page a jms été chargée
     socket.emit('loadMessages', loadMessages());

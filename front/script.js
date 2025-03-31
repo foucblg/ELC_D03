@@ -189,7 +189,7 @@ function switch_mode(){
         mode = "direct";
         document.getElementById('mode').textContent = "Voir l'histoire";
         clear_grid();
-        // socket.emit('loadPixels');
+        socket.emit("askPixels");
     }
 }
 function clear_grid(){
