@@ -143,6 +143,7 @@ async function checkLoginStatus() {
         document.getElementById('signForm').style.display = 'none';
     }
     else {
+        document.getElementById('messageForm').style.display = 'none';
         document.getElementById('logoutForm').style.display = 'none';
         document.getElementById('colorPicker').style.display = 'none';
     }
@@ -159,22 +160,4 @@ async function history() {
     }
 }
 
-function colorToString(color){
-    switch(color){
-        case "green":
-            return "vert";
-        case "red":
-            return "rouge";
-        case "blue":
-            return "bleu";
-        case "black":
-            return "noir";
-        case "white":
-            return "blanc";
-        case "orange":
-            return "orange";
-        default:
-            return "inconnue";
-    }
-}
 window.onload = checkLoginStatus;

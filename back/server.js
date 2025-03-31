@@ -78,6 +78,25 @@ function hash(str) {
     return hash;
 }
 
+function colorToString(color){
+    switch(color){
+        case "green":
+            return "vert";
+        case "red":
+            return "rouge";
+        case "blue":
+            return "bleu";
+        case "black":
+            return "noir";
+        case "white":
+            return "blanc";
+        case "orange":
+            return "orange";
+        default:
+            return "inconnue";
+    }
+}
+
 // CRUDs
 
 const loadPixels = () => {
@@ -388,7 +407,7 @@ io.on('connection', (socket) => {
         if (token) {
             if (placePixel(x, y, color, token)) {
                 username = getUsernameById(getUserIdByToken(token));
-                text = `Pixel ${color} placé en x = ${x} et y = ${y} par ${username}`;
+                text = `Pixel ${colorToString(color)} placé en x = ${x} et y = ${y} par ${username}`;
                 if (placeMessage(text, token)) {
                     io.emit('placeMessageOnScreen', { text });
                 }
