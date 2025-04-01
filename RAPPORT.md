@@ -9,6 +9,16 @@ Les utilisateurs peuvent voir les nouveaux pixels posés par les autres utilisat
 
 De plus ils peuvent poser n'importe où sur la grille des pixels de la couleur de leur choix parmi une palette.
 
+### Système de placement de pixels
+
+Lorsqu'un utilisateur connecté clique pour poser un pixel, une demande de placement de pixel est émise au serveur.
+Le serveur valide la demande, met à jour la base de données, puis émet à tous les utilisateurs le placement d'un pixel.
+A la réception, les navigateurs mettent à jour l'affichage.
+
+Ainsi :
+* l'information est centralisée : le serveur détient la vérité.
+* on n'affiche pas à l'utilisateur un événement pas encore accepté : lorsqu'un utilisateur clique pour poser un pixel, l'interface ne se met à jour qu'après la validation par le serveur.
+
 ### Connexion
 
 Nous voulions également permettre aux utilisateurs de *s'authentifier* avec une notion de compte.
@@ -42,6 +52,7 @@ Dans ce chat, on distingue deux types de messages :
 Ce dernier type de message fait office de logs du point de vue de l'utilisateur final, permettant d'appréhender l'historique des modifications.
 
 Cette fonctionnalité de messagerie instantanée, non-prévue au départ, a été rapidement implémentée après s'être rendu compte qu'*in fine*, poser un message, c'est comme poser un pixel, mais contenant du texte et non une couleur.
+Le système de "placement de message" est analogue (pour ne pas dire identique) au système de placement de pixels, en deux temps séparés par une validation par le serveur.
 
 ### Historique
 
