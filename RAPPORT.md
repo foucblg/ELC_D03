@@ -79,23 +79,40 @@ Dans le mode "history", les directives du serveur sont ignorées. Il est possibl
 
 ### JavaScript
 
-La majorité du projet est en JavaScript. Ce langage permet de faire des applications web dynamiques et réactives.
+Ce langage permet de faire des applications web dynamiques et réactives.
+La majorité du projet est en JavaScript : il fait tourner à la fois un script côté client (*as intended*) et tout le côté serveur via `Node.js`.
 
-### Express
+#### Express
 
 L'application est basée sur Express, un framework pour Node.js. 
-Cela permet de créer des applications web plus facilement. Tous les endpoints de l'API sont gérés par Express.
+Cela permet de créer des applications web plus facilement.
+Tous les endpoints de l'API sont gérés par Express.
 
-### Socket.io
+Des modules Express tout faits permettent de facilement gérer et parser du JSON, du url-encoded et des cookies, et de servir en une seule ligne des fichiers statiques d'un dossier en bloquant l'accès hors de celui-ci.
 
-Nous utilisons Socket.io pour la communication en temps réel entre le serveur et les clients. Les pixels ainsi que les messages du chat sont envoyés via Socket.io.
+#### Socket.io
+
+Nous utilisons Socket.io pour la communication en temps réel entre le serveur et les clients via websockets. Les pixels ainsi que les messages du chat sont envoyés via Socket.io.
+
+### Sqlite3
+
+Nous utilisons Sqlite3 pour la base de données, via le package `better-sqlite3`.
+Cela permet de stocker *durablement* les comptes utilisateurs, leurs tokens, les pixels, l'historique et les messages du chat.
+
+Cette dépendance ne présente *a priori* aucun inconvénient à notre échelle, et de nombreux avantages :
+* SQLite est du SQL : toute la syntaxe et les concepts nous sont connus.
+* Étant du SQL, c'est une base de données relationnelle : on peut écrire en quelques lignes des requêtes puissantes, d'où un code simple, adapté à l'échelle du projet.
+* `better-sqlite3` est facile d'utilisation.
+
+A chaque démarrage du serveur, les tables sont créées si besoin.
+Aucune colonne n'est nullable.
+Les clefs primaires sont de simples entiers qui s'incrémentent pour les pixels, l'historique et les messages, car ils sont déjà publics.
+Pour les tables d'utilisateurs et de tokens, qui contiennent des informations sensibles, la clef primaire est un morceau de UUID.
+Le type `string` (court) est utilisé partout car les strings à mettre en base de données sont de longueur connues à l'avance.
+A une exception près : le texte des message est de type `text` (long) pour autoriser l'écriture de (très) longs messages.
 
 ### Docker
 
 Nous utilisons Docker pour déployer notre application. Cela permet de déployer l'application plus facilement et de manière plus portable.
-
-### Sqlite3
-
-Nous utilisons Sqlite3 pour la base de données. Cela permet de stocker les utilisateurs, les pixels et les messages du chat.
 
 ## Difficultés rencontrées
