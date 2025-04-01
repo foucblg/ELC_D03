@@ -45,18 +45,25 @@ Par la suite, les cookies étant automatiquement envoyés avec chaque requête H
 
 Finalement, nous voulions ajouter un *chat* (messagerie instantanée) pour que les utilisateurs connectés puissent discuter entre eux.
 Chaque message contient une date, l'utilisateur à l'origine du message, et du texte pur. 
-Dans ce chat, on distingue deux types de messages :
-* ceux envoyés directement par les utilisateurs ;
-* les informations des pixels posés, créés automatiquement en tant que l'utilisateur venant de poser un pixel.
-
-Ce dernier type de message fait office de logs du point de vue de l'utilisateur final, permettant d'appréhender l'historique des modifications.
 
 Cette fonctionnalité de messagerie instantanée, non-prévue au départ, a été rapidement implémentée après s'être rendu compte qu'*in fine*, poser un message, c'est comme poser un pixel, mais contenant du texte et non une couleur.
 Le système de "placement de message" est analogue (pour ne pas dire identique) au système de placement de pixels, en deux temps séparés par une validation par le serveur.
 
+Dans ce chat, on distingue deux types de messages :
+* ceux envoyés directement par les utilisateurs ;
+* les informations des pixels posés, créés automatiquement en tant que l'utilisateur venant de poser un pixel.
+
+Ce dernier type de message fait office de logs du point de vue de l'utilisateur final, permettant d'appréhender l'historique des modifications...
+
 ### Historique
 
+...à ce propos, l'historique de tous les placements de pixels esr stocké.
 
+Sur l'interface, il y a deux modes :
+* le mode "direct" (par défaut) : montre l'état actuel en temps réel de la grille.
+* le mode "history" : retrace l'historique sur la grille, dans l'ordre chronologique.
+
+Dans le mode "history", les directives du serveur sont ignorées. Il est possible à tout moment de revenir au mode "direct", ce qui met fin à l'animation et affiche de nouvel état actuel.
 
 ## Technologies utilisées
 
