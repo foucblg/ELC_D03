@@ -33,8 +33,19 @@ Par la suite, les cookies étant automatiquement envoyés avec chaque requête H
 
 ### Chat
 
-Finalement, nous voulions ajouter un chat pour que les utilisateurs puissent discuter entre eux. 
-Dans ce chat, on y voit les informations des pixels posés ainsi que les messages des utilisateurs.
+Finalement, nous voulions ajouter un *chat* (messagerie instantanée) pour que les utilisateurs connectés puissent discuter entre eux.
+Chaque message contient une date, l'utilisateur à l'origine du message, et du texte pur. 
+Dans ce chat, on distingue deux types de messages :
+* ceux envoyés directement par les utilisateurs ;
+* les informations des pixels posés, créés automatiquement en tant que l'utilisateur venant de poser un pixel.
+
+Ce dernier type de message fait office de logs du point de vue de l'utilisateur final, permettant d'appréhender l'historique des modifications.
+
+Cette fonctionnalité de messagerie instantanée, non-prévue au départ, a été rapidement implémentée après s'être rendu compte qu'*in fine*, poser un message, c'est comme poser un pixel, mais contenant du texte et non une couleur.
+
+### Historique
+
+
 
 ## Technologies utilisées
 
