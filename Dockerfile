@@ -7,4 +7,4 @@ COPY . .
 
 EXPOSE 3000
 
-CMD ["node", "--env-file=back\.env", "back/server.js"]
+CMD ["node", "back/server.js"]
