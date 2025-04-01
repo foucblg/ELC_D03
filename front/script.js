@@ -1,24 +1,24 @@
-const socket = io();
-var size_px = 20;
-var dim = 20;
-var id_clicked = -1;
-var container = document.getElementById("gridContainer");
-container.style.gridTemplateColumns = `repeat(${dim}, ${size_px+4}px)`;
-var color_picked = "green";
-var last_color = "white";
-var drawed = false;
-var previous_id_clicked = -1;
-var x;
-var y;
-var mode = "direct";
-var isLoggedIn;
-const params = new URLSearchParams(window.location.search);
-const loginMessage = params.get("login-message"); 
+const socket = io(); // Connection au serveur
+var size_px = 20; // Taille d'un pixel
+var dim = 20; // Dimension de la grille
+var id_clicked = -1; // Id du pixel cliqué
+var previous_id_clicked = -1; // Id du pixel précédent
+var container = document.getElementById("gridContainer"); // Conteneur de la grille
+container.style.gridTemplateColumns = `repeat(${dim}, ${size_px+4}px)`; // Création de la grille
+var color_picked = "green"; // Couleur du pixel
+var last_color = "white"; // Couleur du pixel précédent
+var drawed = false; // Booléen pour savoir si le pixel a été dessiné
+var x; // Coordonnée x du pixel
+var y; // Coordonnée y du pixel
+var mode = "direct"; // Mode en cours (direct ou history)
+var isLoggedIn; // Booléen pour savoir si l'utilisateur est connecté
+const params = new URLSearchParams(window.location.search); // Récupération des paramètres de l'url
+const loginMessage = params.get("login-message");  // Message de connexion
 if (loginMessage) {
     document.getElementById('status').textContent = loginMessage;
 }
 // Création de la grille
-for (let i = 0; i < dim; i++) {
+for (let i = 0; i < dim; i++) { 
     for (let j = 0; j < dim; j++) {
         let canvas = document.createElement("canvas");
         canvas.width = size_px;
@@ -53,14 +53,14 @@ async function selectCanvas(i, j) {
         x = i;
         y = j;
         id_clicked = i*dim + j;
-        container.children[id_clicked].style.border = "2px solid red";
+        container.children[id_clicked].style.border = "2px solid red"; // Bordure rouge pour le pixel cliqué
         previous_id_clicked = id_clicked;
         drawed = false;
     }
 }
 
 // https://dev.to/inezabonte/how-to-make-a-mini-messenger-with-javascript-for-beginners-mm3
-const messageForm = document.getElementById('messageForm');
+const messageForm = document.getElementById('messageForm'); // Form pour envoyer des messages
 messageForm.addEventListener('submit', event => {
     event.preventDefault();
 
@@ -78,21 +78,21 @@ messageForm.addEventListener('submit', event => {
 });
 
 function sendPixel(x, y, color) {
-    socket.emit("placePixelInDB", { x, y, color });
+    socket.emit("placePixelInDB", { x, y, color }); // Envoi des coordonnées et de la couleur du pixel en WS
 }
 
 function sendMessage(text) {
-    socket.emit("placeMessageInDB", { text });
+    socket.emit("placeMessageInDB", { text }); // Envoi du message en WS
 }
 
-function drawPixel(x, y, color) {
+function drawPixel(x, y, color) { // Dessine un pixel de couleur color aux coordonnées x, y
     let canvas = container.children[x * dim + y];
     let ctx = canvas.getContext("2d");
     ctx.fillStyle = color;
     ctx.fillRect(0, 0, size_px, size_px);
 }
 
-function showMessage(msg) {
+function showMessage(msg) { // Affiche un message dans la chatbox
     console.log(JSON.stringify(msg));
     const chatbox = document.getElementById('chatbox');
     date = new Date(msg.date);
@@ -102,11 +102,11 @@ function showMessage(msg) {
     chatbox.scrollTop = chatbox.scrollHeight;
 }
 
-function sleep(ms) {
+function sleep(ms) { // Fonction pour attendre ms millisecondes
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-async function drawInCanvas(id) {
+async function drawInCanvas(id) { // Dessine un pixel de couleur color_picked dans le canvas
     let canvas = container.children[id];
     let ctx = canvas.getContext("2d");
     id_clicked = -1;
@@ -120,7 +120,7 @@ async function drawInCanvas(id) {
     ctx.fillRect(0, 0, size_px+5, size_px+5);
 }
 
-socket.on("loadPixels", async (pixels) => {
+socket.on("loadPixels", async (pixels) => { // Charge les pixels de la base de données en WS
     for (let pixel of pixels) {
         let {x, y, color} = pixel;
         color_picked = color;
@@ -128,24 +128,24 @@ socket.on("loadPixels", async (pixels) => {
     }
 });
 
-socket.on("placePixelOnScreen", ({ x, y, color }) => {
+socket.on("placePixelOnScreen", ({ x, y, color }) => { // Place un pixel sur l'écran en WS
     if (mode == "direct") {
         color_picked = color;
         drawInCanvas(x * dim + y);
     }
 });
 
-socket.on("loadMessages", async (messages) => {
+socket.on("loadMessages", async (messages) => { // Charge les messages de la base de données en WS
     for (let msg of messages) {
         showMessage(msg);
     }
 });
 
-socket.on("placeMessageOnScreen", (msg) => {
+socket.on("placeMessageOnScreen", (msg) => { // Place un message sur l'écran en WS
     showMessage(msg);
 });
 
-async function checkLoginStatus() {
+async function checkLoginStatus() { // Vérifie si l'utilisateur est connecté
     const res = await fetch("/login-status");
     isLoggedIn = await res.json();
     if (isLoggedIn) {
@@ -157,13 +157,13 @@ async function checkLoginStatus() {
     }
 }
 
-async function get_pixel_color(x, y) {
+async function get_pixel_color(x, y) { // Récupère la couleur du pixel aux coordonnées x, y
     const res = await fetch(`/color/${x}/${y}`);
     result = await res.json();
     return result.color;
 }
 
-async function history() {
+async function history() { // Affiche l'historique des pixels
     const res = await fetch("/history");
     const pixels = await res.json();
     clear_grid();
@@ -181,11 +181,11 @@ async function history() {
     mode = "direct"
     document.getElementById('mode').textContent = "Voir l'histoire";
     clear_grid();
-    socket.emit("askPixels");
+    socket.emit("askPixels"); // Demande les pixels en WS pour revenir au direct
 }
 
 
-function switch_mode(){
+function switch_mode(){ // Change le mode d'affichage'
     if (mode == "direct"){
         mode = "history";
         history();
@@ -197,7 +197,7 @@ function switch_mode(){
     }
 }
 
-function clear_grid() {
+function clear_grid() { // Efface la grille
     for (let i = 0; i < dim; i++) {
         for (let j = 0; j < dim; j++) {
             let canvas = container.children[i*dim + j];
