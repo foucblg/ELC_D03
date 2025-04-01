@@ -43,13 +43,23 @@ Par la suite, les cookies étant automatiquement envoyés avec chaque requête H
 
 ### Chat
 
-Finalement, nous voulions ajouter un *chat* (messagerie instantanée) pour que les utilisateurs connectés puissent discuter entre eux.
-Chaque message contient une date, l'utilisateur à l'origine du message, et du texte pur. 
+Finalement, nous voulions ajouter un *chat* (messagerie instantanée) pour que les utilisateurs connectés puissent discuter entre eux, dans une seule conversation générale.
+Chaque message contient une date, l'utilisateur à l'origine du message, et du texte pur.
+La conversation est publique : bien que seuls les utilisateurs connectés puissent *écrire*, tout le monde peut *lire* les messages.
+
+#### Justification
 
 Cette fonctionnalité de messagerie instantanée, non-prévue au départ, a été rapidement implémentée après s'être rendu compte qu'*in fine*, poser un message, c'est comme poser un pixel, mais contenant du texte et non une couleur.
-Le système de "placement de message" est analogue (pour ne pas dire identique) au système de placement de pixels, en deux temps séparés par une validation par le serveur.
+Le système de "placement de message" est analogue (pour ne pas dire identique) au système de placement de pixels, en deux temps séparés par une validation par le serveur. 
 
-Dans ce chat, on distingue deux types de messages :
+Une messagerie instantanée affichée sur le côté est monnaie courante dans les mini-jeux en ligne.
+Nous avons décidé de implémenter cette fonctionnalité car elle est à *haute valeur ajoutée* :
+* elle a été relativement rapide à ajouter ;
+* elle est très attendue dans ce type de mini-jeu en ligne, et change complètement l'expérience de jeu.
+
+#### Deux types de messages
+
+Dans ce *chat*, on distingue deux types de messages :
 * ceux envoyés directement par les utilisateurs ;
 * les informations des pixels posés, créés automatiquement en tant que l'utilisateur venant de poser un pixel.
 
