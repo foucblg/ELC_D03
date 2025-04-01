@@ -140,6 +140,10 @@ export const createUser = (username, password) => {
 }
 
 export const getUserIdByToken = (token) => {
+    if (token === undefined) {
+        console.log(`CRUD getUserIdByToken (début et fin) < pas de token > ${token}`);
+        return null;
+    };
     let access = db.prepare(`
         SELECT user_id FROM access_token
         WHERE token = @token
