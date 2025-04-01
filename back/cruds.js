@@ -181,7 +181,7 @@ export const login = (username, password) => {
     });
     
     if (user) {
-        let token = uuidv4.toString().slice(-12);
+        let token = uuidv4().toString().slice(-12);
         console.log(`CRUD login (début) < user ${user.id} > ${username}`);
         db.prepare(`
             UPDATE access_token SET token = @token
