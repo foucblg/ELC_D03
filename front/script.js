@@ -96,7 +96,7 @@ function showMessage(msg) { // Affiche un message dans la chatbox
     console.log(JSON.stringify(msg));
     const chatbox = document.getElementById('chatbox');
     date = new Date(msg.date);
-    dateString = date.toLocaleTimeString(navigator.language, {timeZone: "UTC", hour: '2-digit', minute:'2-digit'});
+    dateString = date.toLocaleTimeString(navigator.language, {timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone, hour: '2-digit', minute:'2-digit'});
     text = dateString + " <b>" + msg.username + "</b> " + msg.text;
     chatbox.innerHTML += text + "<br>";
     chatbox.scrollTop = chatbox.scrollHeight;
