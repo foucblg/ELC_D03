@@ -36,9 +36,7 @@ docker build -t rplace:1.0 .
 * Créer quelque part un dossier qui servira de volume pour la base de données
 * Remplir un `docker-compose.yml`
     * Bien mettre le chemin du volume
-    * Choisir le port local
-* Remplir un `.env`
-    * Bien mettre la même port que celui exposé
+    * Choisir le port local, sachant que le port exposé par l'image est le 3000
 
 ### Lancer le projet
 
