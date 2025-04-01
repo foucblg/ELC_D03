@@ -65,6 +65,12 @@ Dans ce *chat*, on distingue deux types de messages :
 
 Ce dernier type de message fait office de logs du point de vue de l'utilisateur final, permettant d'appréhender l'historique des modifications...
 
+#### Sécurité
+
+La boîte de texte est le seul endroit de l'application où un utilisateur peut rentrer du contenu arbitraire, qui va être affiché sur les machines des autres utilisateurs.
+Pour éviter des attaques par injection de code arbitraire, tous les tags (`<...>`) du texte d'un message sont retirés.
+Ce choix quelque peu violent assure que le texte stocké en base de données est du texte plat au sens de HTML.
+
 ### Historique
 
 ...à ce propos, l'historique de tous les placements de pixels esr stocké.
