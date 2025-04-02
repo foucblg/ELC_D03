@@ -133,9 +133,10 @@ Techniquement :
 
 ### Gestion de projet
 
-Pour organiser et suivre les tâches, nous avons utilisé Planka, une alternative à Trello, un outil de gestion de projet.
+Pour organiser et suivre les tâches, nous avons utilisé Planka, une alternative à Trello.
+C'est un outil de gestion de projet, hébergé par ÉCLAIR, l'association d'informatique de l'école, dont nous faisons partie.
 
-[Caser une image ça pourrait être pas mal]
+![Tableau de bord Planka](planka.png)
 
 ### Architecture du code
 
