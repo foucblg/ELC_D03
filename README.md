@@ -2,6 +2,8 @@
 
 Projet de l'électif "Applications Web" : recréer un [r/place](https://en.wikipedia.org/wiki/R/place)
 
+![r/place](rplace.png)
+
 ## Développement
 
 ### Configurer le projet
