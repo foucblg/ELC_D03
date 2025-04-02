@@ -148,9 +148,9 @@ Le découpage back-front se justifie par le besoin d'avoir tous les scripts côt
 
 Le dossier `back` se compose de 5 fichiers en Node.js :
 * `server.js` : c'est le fichier principal à lancer, il sert de point d'entrée au projet. Il crée le serveur, sert statiquement le dossier `front`, met en place les endpoints et les websockets, et crée les tables SQL si besoin.
-* `endpoints.js`
-* `socket.js`
-* `cruds.js`
+* `endpoints.js` : ils reçoivent les requêtes HTTP, traitent leur contenu (endpoint, query params, cookies, redirections, ...) et font appel à des CRUDs.
+* `socket.js` : c'est l'homologue de `endpoints.js` pour les websockets. Ensemble ces deux fichiers forment une API complète. Ils s'occupent à la fois de recevoir et d'émettre les pixels et les messages, assurant une communication en temps réel. Comme pour les requêtes HTTP, le cookie automatiquement envoyé est traité.
+* `cruds.js` : ce sont des fonctions prêtes à l'emploi et les seules qui interagissent directement avec la base de données (pour Create, Read, Update ou Delete du contenu). Elles servent à masquer l'usage de la base de données dans l'API.
 * `utils.js`
 
 ## Difficultés rencontrées
