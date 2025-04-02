@@ -119,6 +119,49 @@ A une exception près : le texte des message est de type `text` (long) pour auto
 
 ### Docker
 
-Nous utilisons Docker pour déployer notre application. Cela permet de déployer l'application plus facilement et de manière plus portable.
+Nous utilisons Docker pour packager et pour déployer notre application.
+Cela permet de déployer l'application plus facilement et sur n'importe quelle machine.
+Les commandes nécessaires sont incluses dans le [README.md](README.md).
+
+Techniquement :
+* le projet peut être build en une image (abstraite), grâce à un Dockerfile et un .dockerignore.
+* à partir d'une image, on peut lancer un conteneur (concret) qui fait tourner l'image, grâce à un compose en YAML et éventuellement un .env et des volumes.
+
+## Organisation
+
+### Gestion de projet
+
+Caser qlq lignes sur Planka
+
+### Architecture du code
+
+L'archi parle d'elle-mm, faudrait juste :
+* justifier le découoage en dossier back-front(-compose)
+* expliquer le rôle de chaque fichier du back
 
 ## Difficultés rencontrées
+
+### Temps imparti
+
+### Gestion de projet
+
+### Difficultés techniques
+
+Caser un disclaimer : on a d'abord voulu faire un truc *fonctionnel*, avec plein de features, tant pis s'il manque qlq lignes de CSS
+
+#### Lancement du projet : poser de bonnes bases
+
+#### Migrations : tout supprimer
+
+#### De websockets et de cookies
+
+#### Affichage du statut
+
+## Ouverture
+
+On aurait pu aussi mettre ces features :
+* Cooldown (temps d'attente, mesure anti-spam)
+* Gestion de compte : modifier son username ou mdp, récupérer un mdp oublié
+* Associer un compte à une adresse mail : pourvu qu'on puisse envoyer des mails
+* Afficher des statistiques : nombre d'utilisateurs (en ligne ou au total), nombre de pixels posés, temps passés, etc.
+* Rendre plus visible le placement d'un nouveau pixel
