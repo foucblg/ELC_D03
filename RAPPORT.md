@@ -159,8 +159,12 @@ Le dossier `back` se compose de 5 fichiers en Node.js :
 
 ### Lancement du projet : poser de bonnes bases
 
+Il a été difficile pour nous de bien démarrer le projet. Nous avons du essayer différentes librairies de bdd avant de trouver celle qui nous convenait (better-sqlite3).
+
 ### Cookies
 
+Initialement, pour que le client manipule son token, il fallait qu'il lisent les cookies. Le serveur les déposaient en http only, ce qui empêchait le client de les lire. 
+Finalement, au chargement de la page, le client établi avec le serveur une connexion websocket, et le serveur lui envoie le cookie.
 
 
 ## Ouverture
