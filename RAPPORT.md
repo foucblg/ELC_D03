@@ -131,13 +131,27 @@ Techniquement :
 
 ### Gestion de projet
 
-Caser qlq lignes sur Planka
+Pour organiser et suivre les tâches, nous avons utilisé Planka, une alternative à Trello, un outil de gestion de projet.
+
+[Caser une image ça pourrait être pas mal]
 
 ### Architecture du code
 
-L'archi parle d'elle-mm, faudrait juste :
-* justifier le découoage en dossier back-front(-compose)
-* expliquer le rôle de chaque fichier du back
+Bien ranger son code est essentiel pour la maintenabilité.
+
+L'architecture parle d'elle-même :
+* un dossier `back` pour le code côté serveur;
+* un dossier `front` pour le code côté client;
+* un dossier `compose` à part pour déployer le projet via Docker Compose.
+
+Le découpage back-front se justifie par le besoin d'avoir tous les scripts côté serveur dans un même dossier, tout en servant statiquement un dossier.
+
+Le dossier `back` se compose de 5 fichiers en Node.js :
+* `server.js` : c'est le fichier principal à lancer, il sert de point d'entrée au projet. Il crée le serveur, sert statiquement le dossier `front`, met en place les endpoints et les websockets, et crée les tables SQL si besoin.
+* `endpoints.js`
+* `socket.js`
+* `cruds.js`
+* `utils.js`
 
 ## Difficultés rencontrées
 
