@@ -2,6 +2,8 @@
 
 ## Fonctionnalités
 
+/!\ Nous avons visé à implémenter un maximum de fonctionnalités, le visuel n'est pas parfait.
+
 ### Grille interactive
 
 Nous avions pour objectif de créer une grille de taille arbitraire avec laquelle les utilisateurs peuvent interagir en posant des pixels de différentes couleurs. 
@@ -155,21 +157,11 @@ Le dossier `back` se compose de 5 fichiers en Node.js :
 
 ## Difficultés rencontrées
 
-### Temps imparti
+### Lancement du projet : poser de bonnes bases
 
-### Gestion de projet
+### Cookies
 
-### Difficultés techniques
 
-Caser un disclaimer : on a d'abord voulu faire un truc *fonctionnel*, avec plein de features, tant pis s'il manque qlq lignes de CSS
-
-#### Lancement du projet : poser de bonnes bases
-
-#### Migrations : tout supprimer
-
-#### De websockets et de cookies
-
-#### Affichage du statut
 
 ## Ouverture
 
@@ -178,4 +170,5 @@ On aurait pu aussi mettre ces features :
 * Gestion de compte : modifier son username ou mdp, récupérer un mdp oublié
 * Associer un compte à une adresse mail : pourvu qu'on puisse envoyer des mails
 * Afficher des statistiques : nombre d'utilisateurs (en ligne ou au total), nombre de pixels posés, temps passés, etc.
-* Rendre plus visible le placement d'un nouveau pixel
+* Système de modération : bannir un utilisateur, supprimer un message, etc.
+* Des migrations de bdd : pour éviter de supprimer toutes les données à chaques nouveautés de l'application dans la bdd
