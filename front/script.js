@@ -40,23 +40,31 @@ colorBoxes.forEach(function(box) {
     box.addEventListener("click", function() {
         if (id_clicked == -1) return;
         color_picked = box.getAttribute("data-color");
+        drawed = true;
         sendPixel(x, y, color_picked);
     });
 });
 
+let isProcessing = false;
+
 async function selectCanvas(i, j) {
+    if (isProcessing) return;
+    isProcessing = true; 
     if (isLoggedIn && mode == "direct") {
         if (!drawed && previous_id_clicked != -1) {
             container.children[previous_id_clicked].style.border = `2px solid ${last_color}`;
         }
+
         last_color = await get_pixel_color(i, j);
         x = i;
         y = j;
-        id_clicked = i*dim + j;
-        container.children[id_clicked].style.border = "2px solid red"; // Bordure rouge pour le pixel cliqué
+        id_clicked = i * dim + j;
+
+        container.children[id_clicked].style.border = "2px solid red";
         previous_id_clicked = id_clicked;
         drawed = false;
     }
+    isProcessing = false;
 }
 
 // https://dev.to/inezabonte/how-to-make-a-mini-messenger-with-javascript-for-beginners-mm3
@@ -85,12 +93,6 @@ function sendMessage(text) {
     socket.emit("placeMessageInDB", { text }); // Envoi du message en WS
 }
 
-function drawPixel(x, y, color) { // Dessine un pixel de couleur color aux coordonnées x, y
-    let canvas = container.children[x * dim + y];
-    let ctx = canvas.getContext("2d");
-    ctx.fillStyle = color;
-    ctx.fillRect(0, 0, size_px, size_px);
-}
 
 function showMessage(msg) { // Affiche un message dans la chatbox
     console.log(JSON.stringify(msg));
@@ -109,8 +111,6 @@ function sleep(ms) { // Fonction pour attendre ms millisecondes
 async function drawInCanvas(id) { // Dessine un pixel de couleur color_picked dans le canvas
     let canvas = container.children[id];
     let ctx = canvas.getContext("2d");
-    id_clicked = -1;
-    drawed = true;
 
     canvas.style.transition = "all 100ms linear";
     canvas.style.background = color_picked;
