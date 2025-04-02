@@ -1,5 +1,7 @@
 # Mini-raport pour le projet ELC-D03 : r/place
 
+![r/place](rplace.png)
+
 ## Fonctionnalités
 
 /!\ Nous avons visé à implémenter un maximum de fonctionnalités, le visuel n'est pas parfait.
